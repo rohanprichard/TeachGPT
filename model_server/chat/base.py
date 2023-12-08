@@ -18,7 +18,7 @@ class BaseChatModel:
         self._model = ChatOpenAI(
             openai_api_key="",  # type: ignore
             base_url="http://localhost:1234/v1",  # type: ignore
-            max_tokens=256
+            max_tokens=256,
         )
         self._chat = []
         self.context = ""
@@ -31,7 +31,6 @@ class BaseChatModel:
 
         @self.router.post("/")
         def chat(input: ChatMessageParams):
-
             self._chat.append(HumanMessage(content=input.message))
             self._logger.info(("History before prediction:", self._chat))
             try:
@@ -56,7 +55,7 @@ class BaseChatModel:
                 initiate_params.name,
                 initiate_params.subject,
                 initiate_params.name,
-                initiate_params.course
-                )
+                initiate_params.course,
+            )
 
             self._chat.append(SystemMessage(content=get_system_prompt()))
