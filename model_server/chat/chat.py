@@ -1,3 +1,3 @@
-from model_server.chat.base import BaseChatModel
+from model_server.chat.base import BaseChatBot
 
-chat = BaseChatModel()
+chat = BaseChatBot()

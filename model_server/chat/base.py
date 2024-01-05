@@ -1,61 +1,96 @@
 from langchain.chat_models import ChatOpenAI
-from fastapi import APIRouter
-import openai
-import traceback
-from langchain.chains import ConversationChain
-from langchain.prompts import (
-    ChatPromptTemplate,
+from langchain.schema import (
+    SystemMessage, HumanMessage, AIMessage, BaseMessage
 )
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from logging import Logger
-from model_server.chat.model import ChatMessageParams, InitiateChatParams
-from model_server.chat.util import get_system_prompt, generate_context
+from fastapi import APIRouter
+from typing import List
+
+from model_server.chat.model import (
+    InitiateChatParams,
+    InitiateChatResult,
+    HTTPErrorResponse,
+    ChatMessageResult,
+    ChatMessageParams,
+)
+
+from model_server.prompts.util import (
+    get_system_prompt
+)
 
 
-class BaseChatModel:
-    def __init__(self):
-        openai.base_url = "http://localhost:1234/v1"  # type: ignore
-        self._model = ChatOpenAI(
-            openai_api_key="",  # type: ignore
-            base_url="http://localhost:1234/v1",  # type: ignore
-            max_tokens=256,
+class BaseChatBot:
+    router: APIRouter
+
+    def _init_api_routes(self) -> None:
+        self.router.add_api_route(
+            "/initiate",
+            endpoint=self.initiate_chat,
+            methods=["POST"],
+            responses={
+                200: {"model": InitiateChatResult},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
         )
-        self._chat = []
-        self.context = ""
+
+        self.router.add_api_route(
+            "/",
+            endpoint=self.get_prediction_with_ctx,
+            methods=["POST"],
+            responses={
+                200: {"model": ChatMessageResult},
+                400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
+    def __init__(self):
+        self.chat_history = []
+        self.messages = []
+        self._model = ChatOpenAI(
+                        openai_api_key="NONE",  # type: ignore
+                        openai_api_base="http://127.0.0.1:1234/v1",
+                        max_tokens=800,
+                        temperature=0.3,
+                        streaming=False,
+                    )
+        self._system_prompt = get_system_prompt("chat.txt")
         self.router = APIRouter()
-        self._logger = Logger("Chat Logger")
+        self._init_api_routes()
 
-        @self.router.get("/test")
-        def test():
-            return {"chat": "ok"}
+    def get_prediction_with_ctx(
+            self,
+            chat_message: ChatMessageParams
+            ) -> ChatMessageResult:
 
-        @self.router.post("/")
-        def chat(input: ChatMessageParams):
-            self._chat.append(HumanMessage(content=input.message))
-            self._logger.info(("History before prediction:", self._chat))
-            try:
-                response = self._model.invoke(self._chat)
-                print(response)
+        self.chat_history.append(HumanMessage(content=chat_message.message))
+        messages: List[BaseMessage] = [
+            SystemMessage(content=self._system_prompt.format(
+                          user_context=self.ctx
+                          ))] + self.chat_history  # type: ignore
+        result = self._model.predict_messages(
+            messages=messages
+        )
+        self.chat_history.append(AIMessage(content=result.content))
+        return ChatMessageResult(
+            message=result.content
+        )
 
-            except Exception:
-                print(traceback.format_exc())
-                return "Something went wrong......"
-
-            self._chat.append(response)
-            self._logger.info("AI response:" + str(response.content))
-
-            self._logger.info(("History after prediction:", self._chat))
-            return response.content
-
-        @self.router.post("/initiate")
-        def initiate(initiate_params: InitiateChatParams):
-            self._chat = []
-
-            self.context = generate_context(
-                initiate_params.name,
-                initiate_params.subject,
-                initiate_params.name,
-                initiate_params.course,
-            )
-
-            self._chat.append(SystemMessage(content=get_system_prompt()))
+    def initiate_chat(self, params: InitiateChatParams):
+        self.ctx = get_system_prompt("user_ctx.txt").format(
+            user_name=params.name,
+            user_gender=params.gender,
+            user_year=params.year,
+            user_course=params.course,
+            subject_request=params.subject,
+        )
+        return InitiateChatResult(
+            messages=[
+                {
+                    "role": "user" if isinstance(chat, HumanMessage)
+                    else "bot",
+                    "message": chat.content
+                 } for chat in self.chat_history
+            ]
+        )
