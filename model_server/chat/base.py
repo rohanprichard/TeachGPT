@@ -45,6 +45,18 @@ class BaseChatBot:
             },
         )
 
+        self.router.add_api_route(
+            "/delete",
+            endpoint=self.delete_chat_history,
+            methods=["POST"],
+            responses={
+                200: {"model": InitiateChatResult},
+                400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
     def __init__(self):
         self.chat_history = []
         self.messages = []
@@ -93,4 +105,13 @@ class BaseChatBot:
                     "message": chat.content
                  } for chat in self.chat_history
             ]
+        )
+
+    def delete_chat_history(self):
+
+        self.chat_history = []
+        self.messages = []
+
+        return InitiateChatResult(
+            messages=[]
         )
