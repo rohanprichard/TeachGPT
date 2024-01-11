@@ -1,9 +1,11 @@
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.openai import ChatOpenAI
+from langchain.chat_models.fireworks import ChatFireworks
 from langchain.schema import (
     SystemMessage, HumanMessage, AIMessage, BaseMessage
 )
 from fastapi import APIRouter
 from typing import List
+import logging
 
 from model_server.chat.model import (
     InitiateChatParams,
@@ -60,6 +62,15 @@ class BaseChatBot:
     def __init__(self):
         self.chat_history = []
         self.messages = []
+
+        self._model = ChatFireworks(
+            model="accounts/fireworks/models/yi-34b-200k-capybara",
+            model_kwargs={
+                "temperature": 0.3,
+                "max_tokens": 500,
+            }
+        )
+
         self._model = ChatOpenAI(
                         openai_api_key="NONE",  # type: ignore
                         openai_api_base="http://127.0.0.1:1234/v1",
@@ -67,6 +78,8 @@ class BaseChatBot:
                         temperature=0.3,
                         streaming=False,
                     )
+        self.logger = logging.getLogger()
+        self.logger.info("Initiated local chat model")
         self._system_prompt = get_system_prompt("chat.txt")
         self.router = APIRouter()
         self._init_api_routes()
@@ -77,6 +90,8 @@ class BaseChatBot:
             ) -> ChatMessageResult:
 
         self.chat_history.append(HumanMessage(content=chat_message.message))
+        self.logger.info(f"user chat: {chat_message.message}")
+        self.logger.info(f"using {len(self.chat_history) - 1} messages as history")
         messages: List[BaseMessage] = [
             SystemMessage(content=self._system_prompt.format(
                           user_context=self.ctx
@@ -85,6 +100,7 @@ class BaseChatBot:
             messages=messages
         )
         self.chat_history.append(AIMessage(content=result.content))
+        self.logger.info(f"ai response: {result.content}")
         return ChatMessageResult(
             message=result.content
         )
@@ -97,6 +113,7 @@ class BaseChatBot:
             user_course=params.course,
             subject_request=params.subject,
         )
+        self.logger.info(f"Initiated with {len(self.messages)} existing messages")
         return InitiateChatResult(
             messages=[
                 {

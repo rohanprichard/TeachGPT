@@ -6,6 +6,7 @@ import ChatMessage from './ChatMessage';
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const [initiateParams, setInitiateParams] = useState([])
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
