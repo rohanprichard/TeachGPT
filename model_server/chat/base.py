@@ -61,9 +61,11 @@ class BaseChatBot:
         )
 
     def __init__(self):
+
         self.logger = logging.getLogger(f"{__name__}")
         logging.basicConfig()
         self.logger.setLevel(logging.DEBUG)
+
         self.logger.info("Initiated local chat model")
 
         if cfg["USE_OPENAI_ENDPOINT"] == 1:
@@ -88,7 +90,9 @@ class BaseChatBot:
             )
 
         self._system_prompt = get_system_prompt("chat.txt")
-        self.router = APIRouter()
+        self.router = APIRouter(
+            tags=["Chat"]
+        )
         self._init_api_routes()
 
     def get_prediction_with_ctx(
