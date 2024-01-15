@@ -121,16 +121,16 @@ input[type="text"] {
 .bot-message {
   background-color: #f0f0f0;
   text-align: left;
-  background-color: lightgray;
+  background-color: rgb(216, 216, 216);
 }
 
 code {
-  font-family: 'Arial', sans-serif;
+  font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;;
   white-space : pre-wrap !important;
 }
 
 .user-message {
-  background-color: #007bff;
+  background-color: #7300ff;
   color: #fff;
   text-align: right;
 }

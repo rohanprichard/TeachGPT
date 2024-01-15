@@ -6,7 +6,6 @@ import ChatMessage from './ChatMessage';
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [initiateParams, setInitiateParams] = useState([])
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -14,16 +13,18 @@ function ChatInterface() {
 
   useEffect(scrollToBottom, [messages]);
 
+  const init_body = {
+    "name": "Rohan",
+    "gender": "male",
+    "subject": "Python programming",
+    "year": "fourth year",
+    "course": "Computer Science and Engineering"
+}
+
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
-        const init_body = {
-            "name": "Rohan",
-            "gender": "male",
-            "subject": "Python programming",
-            "year": "fourth year",
-            "course": "Computer Science and Engineering"
-        }
+        
         const response = await fetch('http://localhost:4000/chat/initiate',{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -68,12 +69,12 @@ function ChatInterface() {
 
   return (
     <div className="chat-container">
-      <header className="chat-header">URL Question & Answer</header>
+      <header className="chat-header">Question & Answers!</header>
       {
         messages.length === 0 
           && 
         <div className="chat-message bot-message">
-          <p className="initial-message">Hi! I'm here to help you study! Ask me anything you want about</p>
+          <p className="initial-message">Hi! I'm here to help you study! Ask me anything you want about {init_body.subject}</p>
         </div>
       }
       <div className="chat-messages">

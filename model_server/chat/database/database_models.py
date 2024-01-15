@@ -32,9 +32,7 @@ class Chat(Base):
     time = Column(DateTime, index=True)
     description = Column(String, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    messages = relationship(
-        "ChatMessage", back_populates="chat"
-    )
+    messages = relationship("ChatMessage", back_populates="chat")
     user = relationship("User", back_populates="chats")
 
 

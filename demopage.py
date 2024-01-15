@@ -1,4 +1,5 @@
 import streamlit as st
+
 # import traceback
 import openai
 from langchain.chat_models import ChatOpenAI
@@ -10,13 +11,13 @@ from logging import Logger
 
 memory = ConversationBufferWindowMemory(k=2)
 
-openai.api_base="http://localhost:1234/v1"
+openai.api_base = "http://localhost:1234/v1"
 model = ChatOpenAI(
     openai_api_key="OPENAI_API_KEYEwww",  # type: ignore
     base_url="http://localhost:1234/v1",  # type: ignore
     max_tokens=512,
     temperature=0.45,
-    model_kwargs={"stop": ["\nAssistant:", "\nUser:", "Assistant:", "User:"]}
+    model_kwargs={"stop": ["\nAssistant:", "\nUser:", "Assistant:", "User:"]},
 )
 
 logger = Logger("ChatBot")
@@ -89,9 +90,7 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(prompt)
 
     # Add user message to chat history
-    st.session_state.messages.append(
-        {"role": "user", "content": prompt}
-        )
+    st.session_state.messages.append({"role": "user", "content": prompt})
 
     # call LLM
     response = talk(prompt)
@@ -100,6 +99,4 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(response)
 
     # Add assistant response to chat history
-    st.session_state.messages.append(
-        {"role": "assistant", "content": response}
-        )
+    st.session_state.messages.append({"role": "assistant", "content": response})
