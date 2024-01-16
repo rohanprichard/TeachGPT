@@ -12,6 +12,7 @@ class InitiateChatParams(BaseModel):
     subject: str
     year: str
     course: str
+    course_code: str
 
 
 class User(BaseModel):

@@ -18,13 +18,24 @@ function ChatInterface() {
     "gender": "male",
     "subject": "Python programming",
     "year": "fourth year",
-    "course": "Computer Science and Engineering"
+    "course": "Computer Science and Engineering",
+    "course_code":"20CS2010"
 }
+
 
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
-        
+
+        const init_body = {
+          "name": "Rohan",
+          "gender": "male",
+          "subject": "Python programming",
+          "year": "fourth year",
+          "course": "Computer Science and Engineering",
+          "course_code":"20CS2010"
+      }
+
         const response = await fetch('http://localhost:4000/chat/initiate',{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

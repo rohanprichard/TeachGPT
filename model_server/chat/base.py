@@ -9,6 +9,7 @@ from langchain.schema import (
 from fastapi import APIRouter
 from typing import List
 import logging
+from datetime import datetime
 
 from model_server.chat.model import (
     InitiateChatParams,
@@ -19,6 +20,7 @@ from model_server.chat.model import (
 )
 from model_server.config import cfg
 from model_server.prompts.util import get_system_prompt
+from model_server.embedding.embed import embedder
 
 
 class BaseChatBot:
@@ -105,23 +107,36 @@ class BaseChatBot:
             f"using {len(self.chat_history) - 1} messages as history"
             )
 
+        search_ctx, source = embedder.query(
+            chat_message.message,
+            self.course_code
+        )
+
+        self.logger.debug(f"\nSearch ctx: {search_ctx}\n\nSource: {source}")
+
         messages: List[BaseMessage] = [
             SystemMessage(content=self._system_prompt.format(
-                user_context=self.ctx
+                user_context=self.ctx,
+                search_context=search_ctx,
+                source=source
                 ))
         ] + self.chat_history  # type: ignore
-
+        t = datetime.now()
+        self.logger.debug("Starting prediction")
         result = self._model.predict_messages(messages=messages)
 
         self.chat_history.append(AIMessage(content=result.content))
-        self.logger.info(f"ai response: {result.content}")
+        self.logger.info(
+            f"ai response: {result.content}\n \
+            Prediction took: {datetime.now()-t}"
+            )
 
         return ChatMessageResult(message=str(result.content))
 
     def initiate_chat(self, params: InitiateChatParams):
         self.chat_history = []
         self.messages = []
-
+        self.course_code = params.course_code
         self.ctx = get_system_prompt("user_ctx.txt").format(
             user_name=params.name,
             user_gender=params.gender,
