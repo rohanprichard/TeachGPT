@@ -3,9 +3,8 @@ from pydantic import BaseModel
 
 class UserCreate(BaseModel):
     name: str
-    id: str
     email: str
-    hashed_password: str
+    password: str
     department: str
     year: str
 
@@ -19,7 +18,16 @@ class UserResponse(BaseModel):
 
 
 class UserSearch(BaseModel):
-    id: str
+    email: str
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class AuthTokenResponse(BaseModel):
+    access_token: str
 
 
 class HTTPErrorResponse(BaseModel):

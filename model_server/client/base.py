@@ -1,12 +1,18 @@
-from fastapi import HTTPException, APIRouter
-from model_server.database.database import SessionLocal
+from uuid import uuid4
+import traceback
+from fastapi import HTTPException, APIRouter, Depends
 from model_server.database.models import (
+    AuthTokenResponse,
     UserCreate,
+    UserLogin,
     UserResponse,
     UserSearch,
     HTTPErrorResponse
     )
+from sqlalchemy.orm import Session
 from model_server.database.database_models import User
+from model_server.database.database import get_db
+from model_server.util import create_access_token, get_hashed_password, verify_password
 
 
 class Client:
@@ -29,7 +35,7 @@ class Client:
 
         self.router.add_api_route(
             "/",
-            endpoint=self.get_user_by_id,
+            endpoint=self.get_user_by_email,
             methods=["POST"],
             responses={
                 200: {"model": UserSearch},
@@ -39,49 +45,96 @@ class Client:
             },
         )
 
-    # Registration route
-    def register_user(self, user_data: UserCreate):
-        db = SessionLocal()
+        self.router.add_api_route(
+            "/login",
+            endpoint=self.login,
+            methods=["POST"],
+            responses={
+                200: {"model": AuthTokenResponse},
+                400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
+    def register_user(
+        self,
+        user_data: UserCreate,
+        db: Session = Depends(get_db)
+    ):
 
         try:
+            user = db.query(User) \
+                .filter(User.email == user_data.email).first()  # type: ignore
+
+            if user is not None:
+                raise HTTPException(status_code=401, detail='User Exists')
+
             # Create a new user instance
-            new_user = User(**user_data.dict())
+            new_user = User(
+                id=str(uuid4()),
+                name=user_data.name,
+                email=user_data.email,
+                hashed_password=get_hashed_password(user_data.password),
+                department=user_data.department,
+                year=user_data.year,
+            )  # type: ignore
 
             # Add the user to the database
             db.add(new_user)
             db.commit()
 
             return {'message': 'User registered successfully'}
+
         except Exception:
-            import traceback
+
             traceback.print_exc()
             db.rollback()
             raise HTTPException(status_code=500, detail='Server Error')
-        finally:
-            db.close()
 
     # Search user by ID route
-    def get_user_by_id(self, user_search: UserSearch):
-        db = SessionLocal()
+    def get_user_by_email(
+        self,
+        user_search: UserSearch,
+        db: Session = Depends(get_db)
+    ):
+        # Query the user by ID
+        user = db.query(User)\
+            .filter(User.email == user_search.email).first()  # type: ignore
 
-        try:
-            # Query the user by ID
-            user = db.query(User)\
-                .filter(User.id == user_search.id).first()  # type: ignore
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
 
-            if user is None:
-                raise HTTPException(status_code=404, detail="User not found")
+        # Return user details
+        return UserResponse(
+            name=user.name,
+            id=user.id,
+            email=user.email,
+            department=user.department,
+            year=user.year,
+        )
 
-            # Return user details
-            return UserResponse(
-                name=user.name,
-                id=user.id,
-                email=user.email,
-                department=user.department,
-                year=user.year,
-            )
-        finally:
-            db.close()
+    def login(
+        self,
+        user_login: UserLogin,
+        db: Session = Depends(get_db)
+    ):
+
+        user = db.query(User) \
+            .filter(User.email == user_login.email).first()  # type: ignore
+
+        if user is None:
+            return HTTPErrorResponse(detail='User does not exist')
+
+        if not verify_password(
+            password=user_login.password,
+            hashed_pass=user.hashed_password
+        ):
+            return HTTPErrorResponse(detail='User does not exist')
+
+        return AuthTokenResponse(
+            access_token=create_access_token(user.id)
+        )
 
 
 client = Client()

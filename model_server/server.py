@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 from model_server.chat.chat import chat
+from model_server.database.database import get_db
 from model_server.embedding.embed import embedder
 from model_server.client.base import client
 
@@ -20,8 +22,10 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def root(
+    db: Session = Depends(get_db)
+):
+    return {"db": "ok"}
 
 
 app.include_router(chat.router, prefix="/chat")
