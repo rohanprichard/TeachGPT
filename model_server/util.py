@@ -7,7 +7,6 @@ from jose import jwt
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 ALGORITHM = "HS256"
 JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
-JWT_REFRESH_SECRET_KEY = os.environ["JWT_REFRESH_SECRET_KEY"]
 
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

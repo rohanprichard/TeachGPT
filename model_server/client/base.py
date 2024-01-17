@@ -12,7 +12,12 @@ from model_server.database.models import (
 from sqlalchemy.orm import Session
 from model_server.database.database_models import User
 from model_server.database.database import get_db
-from model_server.util import create_access_token, get_hashed_password, verify_password
+from model_server.deps import get_current_user
+from model_server.util import (
+    create_access_token,
+    get_hashed_password,
+    verify_password
+)
 
 
 class Client:
@@ -21,17 +26,6 @@ class Client:
         self._init_api_routes()
 
     def _init_api_routes(self) -> None:
-        self.router.add_api_route(
-            "/register",
-            endpoint=self.register_user,
-            methods=["POST"],
-            responses={
-                200: {"model": UserResponse},
-                400: {"model": HTTPErrorResponse},
-                401: {"model": HTTPErrorResponse},
-                403: {"model": HTTPErrorResponse},
-            },
-        )
 
         self.router.add_api_route(
             "/",
@@ -46,11 +40,35 @@ class Client:
         )
 
         self.router.add_api_route(
+            "/register",
+            endpoint=self.register_user,
+            methods=["POST"],
+            responses={
+                200: {"model": UserResponse},
+                400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
+        self.router.add_api_route(
             "/login",
             endpoint=self.login,
             methods=["POST"],
             responses={
                 200: {"model": AuthTokenResponse},
+                400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
+        self.router.add_api_route(
+            "/me",
+            endpoint=self.get_me,
+            methods=["GET"],
+            responses={
+                200: {"model": UserResponse},
                 400: {"model": HTTPErrorResponse},
                 401: {"model": HTTPErrorResponse},
                 403: {"model": HTTPErrorResponse},
@@ -70,7 +88,6 @@ class Client:
             if user is not None:
                 raise HTTPException(status_code=401, detail='User Exists')
 
-            # Create a new user instance
             new_user = User(
                 id=str(uuid4()),
                 name=user_data.name,
@@ -80,7 +97,6 @@ class Client:
                 year=user_data.year,
             )  # type: ignore
 
-            # Add the user to the database
             db.add(new_user)
             db.commit()
 
@@ -92,7 +108,6 @@ class Client:
             db.rollback()
             raise HTTPException(status_code=500, detail='Server Error')
 
-    # Search user by ID route
     def get_user_by_email(
         self,
         user_search: UserSearch,
@@ -135,6 +150,9 @@ class Client:
         return AuthTokenResponse(
             access_token=create_access_token(user.id)
         )
+
+    def get_me(self, user: User = Depends(get_current_user)):
+        return user
 
 
 client = Client()

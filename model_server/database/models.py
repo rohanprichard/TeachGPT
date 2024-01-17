@@ -32,3 +32,8 @@ class AuthTokenResponse(BaseModel):
 
 class HTTPErrorResponse(BaseModel):
     detail: str
+
+
+class TokenPayload(BaseModel):
+    sub: str
+    exp: int

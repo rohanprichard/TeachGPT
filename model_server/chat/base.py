@@ -27,16 +27,6 @@ class BaseChatBot:
     router: APIRouter
 
     def _init_api_routes(self) -> None:
-        self.router.add_api_route(
-            "/initiate",
-            endpoint=self.initiate_chat,
-            methods=["POST"],
-            responses={
-                200: {"model": InitiateChatResult},
-                401: {"model": HTTPErrorResponse},
-                403: {"model": HTTPErrorResponse},
-            },
-        )
 
         self.router.add_api_route(
             "/",
@@ -45,6 +35,17 @@ class BaseChatBot:
             responses={
                 200: {"model": ChatMessageResult},
                 400: {"model": HTTPErrorResponse},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+            },
+        )
+
+        self.router.add_api_route(
+            "/initiate",
+            endpoint=self.initiate_chat,
+            methods=["POST"],
+            responses={
+                200: {"model": InitiateChatResult},
                 401: {"model": HTTPErrorResponse},
                 403: {"model": HTTPErrorResponse},
             },
