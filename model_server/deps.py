@@ -17,7 +17,7 @@ from .util import (
 from .database.models import UserResponse
 
 reuseable_oauth = OAuth2PasswordBearer(
-    tokenUrl="login",
+    tokenUrl="/client/login",
 )
 
 HTTPBearerAuthorization = HTTPBearer(auto_error=False, scheme_name="JWT")

@@ -1,6 +1,7 @@
 from uuid import uuid4
 import traceback
 from fastapi import HTTPException, APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from model_server.database.models import (
     AuthTokenResponse,
     UserCreate,
@@ -133,12 +134,12 @@ class Client:
 
     def login(
         self,
-        user_login: UserLogin,
+        user_login: OAuth2PasswordRequestForm = Depends(),
         db: Session = Depends(get_db)
     ):
 
         user = db.query(User) \
-            .filter(User.email == user_login.email).first()  # type: ignore
+            .filter(User.email == user_login.username).first()  # type: ignore
 
         if user is None:
             return HTTPErrorResponse(detail='User does not exist')
@@ -150,7 +151,8 @@ class Client:
             return HTTPErrorResponse(detail='User does not exist')
 
         return AuthTokenResponse(
-            access_token=create_access_token(user.id)
+            access_token=create_access_token(user.id),
+            token_type="bearer"
         )
 
     def get_me(self, user: User = Depends(get_current_user)):

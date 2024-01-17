@@ -162,3 +162,4 @@ cython_debug/
 
 chroma-vectorstore/
 sql_app.db
+.VSCodeCounter/
