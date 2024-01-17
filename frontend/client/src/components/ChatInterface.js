@@ -30,7 +30,7 @@ function ChatInterface() {
         const init_body = {
           "name": "Rohan",
           "gender": "male",
-          "subject": "Python programming",
+          "subject": "C# programming",
           "year": "fourth year",
           "course": "Computer Science and Engineering",
           "course_code":"20CS2010"
@@ -80,7 +80,7 @@ function ChatInterface() {
 
   return (
     <div className="chat-container">
-      <header className="chat-header">Question & Answers!</header>
+      <header className="chat-header">Aristotalk</header>
       {
         messages.length === 0 
           && 

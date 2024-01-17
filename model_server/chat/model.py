@@ -15,13 +15,6 @@ class InitiateChatParams(BaseModel):
     course_code: str
 
 
-class User(BaseModel):
-    name: str
-    year: str
-    department: str
-    subjects: List[str]
-
-
 class HTTPErrorResponse(BaseModel):
     detail: str
 

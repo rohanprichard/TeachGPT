@@ -97,7 +97,7 @@ class Embedder:
                 } for d in docs],
             ids=[
                 (f"{extracted['course_code']}-{extracted['filename']}-"
-                 + str(i)) for i in range(len(docs))],
+                    + str(i)) for i in range(len(docs))],
         )
 
     def query(self, message, course_id):
@@ -106,8 +106,6 @@ class Embedder:
             n_results=1,
             where={"course_code": course_id},
         )
-
-        self.logger.debug(f"Search results: {results}")
 
         if len(results['distances'][0]) != 0:  # type: ignore
             self.logger.debug(f"Confidence: {results}")

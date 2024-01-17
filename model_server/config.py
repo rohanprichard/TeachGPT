@@ -8,5 +8,3 @@ cfg = {
     "ENABLE_DEBUG_LOGGING": os.getenv("ENABLE_DEBUG_LOGGING", 1),
     "FIREWORKS_API_KEY": os.getenv("FIREWORKS_API_KEY"),
 }
-
-print(cfg)
