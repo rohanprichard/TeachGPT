@@ -16,6 +16,7 @@ class User(Base):
     name = Column(String)
     id = Column(String(128), primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
+    gender = Column(String)
     hashed_password = Column(String)
     department = Column(String)
     year = Column(String)
@@ -26,7 +27,6 @@ class Chat(Base):
     __tablename__ = "chats"
     id = Column(String(128), primary_key=True, index=True)
     time = Column(DateTime, index=True)
-    description = Column(String, index=True)
     user_id = Column(String(128), ForeignKey("users.id"))
     messages = relationship("ChatMessage", back_populates="chat")
     user = relationship("User", back_populates="chats")

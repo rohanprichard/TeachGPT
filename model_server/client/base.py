@@ -95,6 +95,7 @@ class Client:
                 hashed_password=get_hashed_password(user_data.password),
                 department=user_data.department,
                 year=user_data.year,
+                gender=user_data.gender
             )  # type: ignore
 
             db.add(new_user)
@@ -127,6 +128,7 @@ class Client:
             email=user.email,
             department=user.department,
             year=user.year,
+            gender=user.gender,
         )
 
     def login(

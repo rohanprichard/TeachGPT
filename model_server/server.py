@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from model_server.chat.chat import chat
-from model_server.database.database import get_db
+from model_server.database.database import get_db, engine, Base
 from model_server.embedding.embed import embedder
 from model_server.client.base import client
 
@@ -31,3 +31,5 @@ async def root(
 app.include_router(chat.router, prefix="/chat")
 app.include_router(embedder.router, prefix="/embed")
 app.include_router(client.router, prefix="/client")
+
+Base.metadata.create_all(bind=engine)  # type: ignore

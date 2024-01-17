@@ -7,11 +7,7 @@ class ChatMessageParams(BaseModel):
 
 
 class InitiateChatParams(BaseModel):
-    name: str
-    gender: str
     subject: str
-    year: str
-    course: str
     course_code: str
 
 
