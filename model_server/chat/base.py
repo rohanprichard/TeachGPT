@@ -138,7 +138,10 @@ class BaseChatBot:
         t = datetime.now()
         self.logger.debug("Starting prediction")
 
-        result = self._model.predict_messages(messages=self.messages)  # type: ignore
+        result = self._model.predict_messages(
+            messages=self.messages,  # type: ignore
+            stop=["</s>"],
+            )
 
         self.chat_history.append(AIMessage(content=result.content))
         self.logger.info(

@@ -5,7 +5,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from model_server.database.models import (
     AuthTokenResponse,
     UserCreate,
-    UserLogin,
     UserResponse,
     UserSearch,
     HTTPErrorResponse
