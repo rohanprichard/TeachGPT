@@ -1,12 +1,20 @@
-from fastapi.routing import APIRouter
-from .model import ExtractionResult
-from fastapi import UploadFile, File
-from .util import pdf_extraction_alg
-from typing import List
-import traceback
-import logging
-import chromadb
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from fastapi import Depends, UploadFile, File
+from fastapi.routing import APIRouter
+from sqlalchemy.orm import Session
+from datetime import datetime
+from uuid import uuid4
+from typing import List
+import chromadb
+import logging
+
+from model_server.database.database_models import Document, User
+from model_server.chat.model import HTTPErrorResponse
+from model_server.database.database import get_db
+from model_server.deps import get_current_user
+from model_server.config import logging_level
+from .model import ExtractionResult
+from .util import pdf_extraction_alg, pptx_extraction_alg
 
 
 class Embedder:
@@ -16,7 +24,7 @@ class Embedder:
 
         self.logger = logging.getLogger(f"{__name__}")
         logging.basicConfig()
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging_level)
 
         self.router = APIRouter(
             tags=["Embeddings"]
@@ -27,54 +35,77 @@ class Embedder:
             methods=["POST"],
             responses={
                 200: {"model": ExtractionResult},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+                404: {"model": HTTPErrorResponse}
             },
         )
-        self.router.add_api_route(
-            "/test",
-            endpoint=self.query,
-            methods=["POST"],
-        )
+        # self.router.add_api_route(
+        #     "/test",
+        #     endpoint=self.query,
+        #     methods=["POST"],
+        # )
 
         self.logger.info("initialized embeddings route")
 
         self._client = chromadb.PersistentClient(path="./chroma-vectorstore")
         self._collection = self._client.get_or_create_collection(
-            "vectorstore-15-1-24"
+            "vectorstore-18-1-24"
             )
+        self.logger.debug("Initialized chromadb")
 
     async def embed_file(
         self,
-        files: List[UploadFile] = File(...)
+        files: List[UploadFile] = File(...),
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
     ):
 
         result_list = []
-        self.logger.info(f"recieved {len(files)} files")
+        self.logger.debug(f"recieved {len(files)} files")
         for file in files:
             result_dict = {}
             try:
                 if str(file.filename)[-4:] == ".pdf":
                     result = await pdf_extraction_alg(file)
-                    result_dict = {
-                        "filename": file.filename[8:],  # type: ignore
-                        "content": result,  # f"{len(result)} characters",
-                        "course_code": file.filename[:8]  # type: ignore
-                    }
-                    self.logger.debug(
-                        f"{len(result)} characters from {file.filename}"
-                        )
 
-                self.add_document(result_dict)
+                elif str(file.filename)[-5:] == ".pptx":
+                    result = await pptx_extraction_alg(file)
+
+                else:
+                    result = ""
+                    self.logger.debug("Placeholder result selected")
+
+                result_dict = {
+                    "filename": file.filename[8:],  # type: ignore
+                    "content": result,  # f"{len(result)} characters",
+                    "course_code": file.filename[:8]  # type: ignore
+                }
+                self.logger.debug(
+                    f"extracted {len(result)} characters from {file.filename}"
+                    )
+
+                check_embeddings = db.query(Document).filter(Document.course_code == result_dict['course_code']).filter(Document.document_name == result_dict['filename']).first()  # type: ignore
+                # type: ignore
+
+                if check_embeddings is not None:
+                    self.logger.info("Document already present")
+                    return HTTPErrorResponse(
+                        detail="Embedding present"
+                    )
+
+                self.add_document(result_dict, db, user)
 
                 result_list.append(result_dict)
 
             except Exception:
-                print(traceback.format_exc())
+                self.logger.error("Embedding error")
 
         return ExtractionResult(
-                results=f"{len(result_list)} files added."
+                results=f"{len(result_list)} files added to vectorstore."
             )
 
-    def add_document(self, extracted):
+    def add_document(self, extracted, db, user):
         self.logger.debug("Initializing Text splitter")
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=800,
@@ -84,11 +115,13 @@ class Embedder:
         )
 
         self.logger.debug("Creating documents of 1500 chars")
+
         docs = text_splitter.create_documents([extracted['content']])
 
         self.logger.debug(
             f"Adding {len(docs)} documents of 1500 chars to vectorstore"
             )
+
         self._collection.add(
             documents=[d.page_content for d in docs],
             metadatas=[{
@@ -100,7 +133,19 @@ class Embedder:
                     + str(i)) for i in range(len(docs))],
         )
 
+        self.logger.info(f"{extracted['filename']} added to embeddings")
+
+        db.add(Document(
+            id=str(uuid4()),
+            added_at=datetime.now(),
+            user_id=user.id,
+            course_code=extracted['course_code'],
+            document_name=extracted['filename']
+        ))  # type: ignore
+        db.commit()
+
     def query(self, message, course_id):
+
         results = self._collection.query(
             query_texts=[message],
             n_results=1,

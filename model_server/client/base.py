@@ -2,6 +2,9 @@ from uuid import uuid4
 import traceback
 from fastapi import HTTPException, APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+import logging
+from sqlalchemy.orm import Session
+
 from model_server.database.models import (
     AuthTokenResponse,
     UserCreate,
@@ -9,7 +12,6 @@ from model_server.database.models import (
     UserSearch,
     HTTPErrorResponse
     )
-from sqlalchemy.orm import Session
 from model_server.database.database_models import User
 from model_server.database.database import get_db
 from model_server.deps import get_current_user
@@ -18,12 +20,17 @@ from model_server.util import (
     get_hashed_password,
     verify_password
 )
+from model_server.config import logging_level
 
 
 class Client:
     def __init__(self):
         self.router = APIRouter(tags=["Client"])
         self._init_api_routes()
+
+        self.logger = logging.getLogger(f"{__name__}")
+        logging.basicConfig()
+        self.logger.setLevel(logging_level)
 
     def _init_api_routes(self) -> None:
 
@@ -81,11 +88,16 @@ class Client:
         db: Session = Depends(get_db)
     ):
 
+        self.logger.info("User Registration Started")
+
         try:
             user = db.query(User) \
                 .filter(User.email == user_data.email).first()  # type: ignore
 
             if user is not None:
+
+                self.logger.error("User exists")
+
                 raise HTTPException(status_code=401, detail='User Exists')
 
             new_user = User(
@@ -101,6 +113,8 @@ class Client:
             db.add(new_user)
             db.commit()
 
+            self.logger.info("User Registration Successful")
+
             return {'message': 'User registered successfully'}
 
         except Exception:
@@ -114,14 +128,18 @@ class Client:
         user_search: UserSearch,
         db: Session = Depends(get_db)
     ):
-        # Query the user by ID
+
+        self.logger.info("Searching for user by email ID")
+
         user = db.query(User)\
             .filter(User.email == user_search.email).first()  # type: ignore
 
         if user is None:
+
+            self.logger.error("User not found")
+
             raise HTTPException(status_code=404, detail="User not found")
 
-        # Return user details
         return UserResponse(
             name=user.name,
             id=user.id,
@@ -137,17 +155,27 @@ class Client:
         db: Session = Depends(get_db)
     ):
 
+        self.logger.info("Login started")
+
         user = db.query(User) \
             .filter(User.email == user_login.username).first()  # type: ignore
 
         if user is None:
+
+            self.logger.error("User not found")
+
             return HTTPErrorResponse(detail='User does not exist')
 
         if not verify_password(
             password=user_login.password,
             hashed_pass=user.hashed_password
         ):
-            return HTTPErrorResponse(detail='User does not exist')
+
+            self.logger.error("Inforrect password, login failed")
+
+            return HTTPErrorResponse(detail='Incorrect password')
+
+        self.logger.info("Login success")
 
         return AuthTokenResponse(
             access_token=create_access_token(user.id),

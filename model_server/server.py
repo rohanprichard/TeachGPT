@@ -5,7 +5,15 @@ from model_server.chat.chat import chat
 from model_server.database.database import get_db, engine, Base
 from model_server.embedding.embed import embedder
 from model_server.client.base import client
+from model_server.config import logging_level
+import logging
 
+
+logger = logging.getLogger(f"{__name__}")
+logging.basicConfig()
+logger.setLevel(logging_level)
+
+logger.info("Initializing fastapi app")
 
 app = FastAPI()
 

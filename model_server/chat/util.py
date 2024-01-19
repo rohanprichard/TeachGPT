@@ -3,17 +3,23 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from langchain.schema import HumanMessage, AIMessage
 from model_server.database.database_models import Chat, ChatMessage
+from model_server.config import logging_level
+import logging
+
+
+logger = logging.getLogger(f"{__name__}")
+logging.basicConfig()
+logger.setLevel(logging_level)
 
 
 def get_system_prompt():
+
     prompt = ""
+
     with open("model_server/prompts/chat.txt", "r") as f:
         prompt = f.read()
+
     return prompt
-
-
-def generate_context(name, subject, year, course):
-    pass
 
 
 def create_or_get_chat_in_db(uid: str, db: Session):
@@ -22,7 +28,9 @@ def create_or_get_chat_in_db(uid: str, db: Session):
 
         if chat is not None:
             if (datetime.now() - chat.time) < timedelta(hours=1):
+                logger.debug(f"found chat with id: {chat.id}")
                 return chat.id
+
     except Exception:
         pass
 
@@ -32,8 +40,11 @@ def create_or_get_chat_in_db(uid: str, db: Session):
                 user_id=uid,
             )  # type: ignore
 
+    logger.debug(f"created new chat with id: {new_chat.id}")
+
     db.add(new_chat)
     db.commit()
+
     return new_chat.id
 
 
@@ -52,5 +63,7 @@ def get_all_chat_messages(chat_id: str, db: Session):
             chat_history.append(HumanMessage(content=message.message))
         else:
             chat_history.append(AIMessage(content=message.message))
+
+    logger.debug(f"Got {len(chat_history)} chats from DB")
 
     return chat_history

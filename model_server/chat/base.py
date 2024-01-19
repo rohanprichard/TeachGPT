@@ -22,7 +22,7 @@ from model_server.chat.model import (
     ChatMessageParams,
 )
 from model_server.chat.util import create_or_get_chat_in_db, get_all_chat_messages
-from model_server.config import cfg
+from model_server.config import cfg, logging_level
 from model_server.database.database import get_db
 from model_server.database.database_models import ChatMessage, User
 from model_server.deps import get_current_user
@@ -74,7 +74,7 @@ class BaseChatBot:
 
         self.logger = logging.getLogger(f"{__name__}")
         logging.basicConfig()
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging_level)
 
         self.logger.info("Initiated local chat model")
 
