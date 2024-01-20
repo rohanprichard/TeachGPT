@@ -13,7 +13,7 @@ from model_server.chat.model import HTTPErrorResponse
 from model_server.database.database import get_db
 from model_server.deps import get_current_user
 from model_server.config import logging_level
-from .model import ExtractionResult
+from .model import DocumentResult, ExtractionResult
 from .util import pdf_extraction_alg, pptx_extraction_alg
 
 
@@ -40,6 +40,19 @@ class Embedder:
                 404: {"model": HTTPErrorResponse}
             },
         )
+
+        self.router.add_api_route(
+            "/documents",
+            endpoint=self.list_documents,
+            methods=["GET"],
+            responses={
+                200: {"model": DocumentResult},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+                404: {"model": HTTPErrorResponse}
+            },
+        )
+
         # self.router.add_api_route(
         #     "/test",
         #     endpoint=self.query,
@@ -161,6 +174,14 @@ class Embedder:
                 )
 
         return ("", "")
+
+    def list_documents(
+        self,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+    ):
+        result = db.query(Document).all()
+        return result
 
 
 embedder = Embedder()

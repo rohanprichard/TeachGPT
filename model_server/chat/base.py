@@ -94,8 +94,8 @@ class BaseChatBot:
             self._model = ChatFireworks(
                 model="accounts/fireworks/models/yi-34b-200k-capybara",
                 model_kwargs={
-                    "temperature": 0.3,
-                    "max_tokens": 500,
+                    "temperature": 0.4,
+                    "max_tokens": 1000,
                 },
             )
 

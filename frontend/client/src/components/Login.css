@@ -1,0 +1,59 @@
+.login-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9; /* Light gray background */
+    box-sizing: border-box;
+}
+
+.chat-header {
+    padding: 20px;
+    background-color: #333; /* Dark gray header */
+    color: #fff;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 12px; /* Slightly reduced vertical margin for labels */
+    color: #555; /* Dark gray label text */
+}
+
+input {
+    padding: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="email"],
+input[type="password"] {
+    /* Specific styling for email and password inputs */
+    width: 100%;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    padding: 14px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

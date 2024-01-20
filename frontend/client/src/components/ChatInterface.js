@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 
-function ChatInterface() {
+function ChatInterface({ accessToken }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
@@ -14,11 +14,7 @@ function ChatInterface() {
   useEffect(scrollToBottom, [messages]);
 
   const init_body = {
-    "name": "Rohan",
-    "gender": "male",
-    "subject": "Python programming",
-    "year": "fourth year",
-    "course": "Computer Science and Engineering",
+    "subject": "C# programming",
     "course_code":"20CS2010"
 }
 
@@ -26,21 +22,21 @@ function ChatInterface() {
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
-
         const init_body = {
-          "name": "Rohan",
-          "gender": "male",
           "subject": "C# programming",
-          "year": "fourth year",
-          "course": "Computer Science and Engineering",
           "course_code":"20CS2010"
       }
 
-        const response = await fetch('http://localhost:4000/chat/initiate',{
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(init_body),
-        });
+      const response = await fetch('http://localhost:4000/chat/initiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}` // Include the access token in the headers
+        },
+        body: JSON.stringify(init_body),
+      });
+
+
         const data = await response.json();
 
         const initialMessages = data.messages.map((message) => ({
@@ -55,7 +51,7 @@ function ChatInterface() {
     };
 
     fetchInitialMessages();
-  }, []);
+  }, [accessToken]);
 
 
   const handleSendMessage = async (event) => {
@@ -67,11 +63,16 @@ function ChatInterface() {
     }    
     setMessages([...messages, userMessage]);
     setInputText('');
+
     const response = await fetch('http://localhost:4000/chat/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}` 
+      },
       body: JSON.stringify(body),
     });
+
     const data = await response.json();
     const botMessage = { text: data.message, isBot: true };
     setMessages(currentMessages => [...currentMessages, botMessage]);
@@ -80,7 +81,7 @@ function ChatInterface() {
 
   return (
     <div className="chat-container">
-      <header className="chat-header">Aristotalk</header>
+      <header className="chat-header">The Socratic Method</header>
       {
         messages.length === 0 
           && 

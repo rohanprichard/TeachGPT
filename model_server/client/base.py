@@ -1,6 +1,7 @@
+from datetime import datetime
 from uuid import uuid4
 import traceback
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
 from sqlalchemy.orm import Session
@@ -102,6 +103,7 @@ class Client:
 
             new_user = User(
                 id=str(uuid4()),
+                created_at=datetime.now(),
                 name=user_data.name,
                 email=user_data.email,
                 hashed_password=get_hashed_password(user_data.password),
@@ -171,9 +173,12 @@ class Client:
             hashed_pass=user.hashed_password
         ):
 
-            self.logger.error("Inforrect password, login failed")
-
-            return HTTPErrorResponse(detail='Incorrect password')
+            self.logger.error("Incorrect password, login failed")
+            raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
         self.logger.info("Login success")
 
