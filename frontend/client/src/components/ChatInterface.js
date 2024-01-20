@@ -81,7 +81,7 @@ function ChatInterface({ accessToken }) {
 
   return (
     <div className="chat-container">
-      <header className="chat-header">The Socratic Method</header>
+      <header className="chat-header"><h2>The Socratic Method</h2></header>
       {
         messages.length === 0 
           && 
@@ -97,8 +97,9 @@ function ChatInterface({ accessToken }) {
       </div>
       <form className="chat-input" onSubmit={handleSendMessage}>
         <input
+          id="in"
           type="text"
-          placeholder="Type a question and press enter ..."
+          placeholder="Message..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
         />

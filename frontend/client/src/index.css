@@ -18,10 +18,13 @@ body, html {
 
 .chat-header {
   padding: 16px;
-  background-color: #000;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  background-color: #8C2F39;
   color: #fff;
   text-align: center;
   font-size: 20px;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .chat-messages {
@@ -37,14 +40,21 @@ body, html {
 .chat-input {
   display: flex;
   padding: 10px;
-  background: #fff;
-  border-top: 1px solid #ccc;
-  width: 90%;
-  max-width: 800px;
+  background: #0D3B66;
+  width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  border-radius: 0;
 }
 
+.chat-input input {
+  width: 700px;
+  background-color: #fcfbf4;
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
 
 
 button {
@@ -91,9 +101,10 @@ input.urlinput[type="text"] {
 }
 
 .initial-message {
-  padding: 10px;
+  padding: 6px;
   color: #666;
   text-align: center;
+  margin: 2px;
 }
 
 /* Chat Message Styles */
@@ -101,15 +112,15 @@ input.urlinput[type="text"] {
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;  
-  padding: 10px;
+  padding: 13px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px;  */
 }
 
 .bot-message {
-  background-color: #f0f0f0;
-  text-align: left;
-  background-color: rgb(216, 216, 216);
+  background-color: #feefdc;
+  text-align: left,;
+  box-shadow: 0 0 10px rgba(164, 145, 0, 0.2);
 }
 
 code {
@@ -118,13 +129,14 @@ code {
 }
 
 .user-message {
-  background-color: #7300ff;
+  background-color: #0D3B66;
   color: #fff;
   text-align: right;
+  box-shadow: 0 0 10px rgba(5, 5, 238, 0.2);
 }
 
 /* Button Styles */
-input[type="button"] {
+card input[type="button"] {
   padding: 14px;
   padding-left: 80px;
   padding-right: 80px;
@@ -134,17 +146,21 @@ input[type="button"] {
   cursor: pointer;
 }
 
-input[type="text"],
+card input[type="text"],
 input[type="email"],
 input[type="password"] {
   flex-grow: 1;
   padding: 10px;
   margin: 8px;
   border: 1px solid #ccc;
-  border-radius: 15px;
-  width: 100%;
+  border-radius: 20px;
+  width: 300px;
   border: 1px solid #ddd;
   box-sizing: border-box;
+}
+
+label{
+  padding: 12px;
 }
 
 .btn-primary {
