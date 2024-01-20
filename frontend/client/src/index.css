@@ -1,5 +1,3 @@
-/* styles.css */
-
 /* Reset some default styles */
 body, html {
   margin: 0;
@@ -10,12 +8,12 @@ body, html {
   width: 100%;
 }
 
-
+/* Chat Styles */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100%; /* Set width to be full viewport width */
+  width: 100%;
 }
 
 .chat-header {
@@ -31,8 +29,8 @@ body, html {
   overflow-y: auto;
   padding: 20px;
   margin: 0 auto;
-  width: 90%; /* Set width to be 90% of the chat-container width */
-  max-width: 800px; /* You can adjust this as needed */
+  width: 90%;
+  max-width: 800px;
   overflow-x: hidden;
 }
 
@@ -41,19 +39,13 @@ body, html {
   padding: 10px;
   background: #fff;
   border-top: 1px solid #ccc;
-  width: 90%; /* Match the width of chat-messages */
-  max-width: 800px; /* Match the max-width of chat-messages */
+  width: 90%;
+  max-width: 800px;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
-input[type="text"] {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  margin-right: 10px;
-}
+
 
 button {
   margin-top: 20px;
@@ -61,7 +53,7 @@ button {
   border: none;
   background-color: #007bff;
   color: #fff;
-  border-radius: 10%; /* Circular button */
+  border-radius: 10%;
   cursor: pointer;
 }
 
@@ -70,17 +62,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
-
-/* Center the main content */
+/* Main Content Styles */
 .App {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f4f4f4;
+  background-color: #fcfbf4;
 }
 
-/* Style the URL input form */
+/* URL Input Form Styles */
 form {
   display: flex;
   flex-direction: column;
@@ -91,16 +82,12 @@ form {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-input[type="text"] {
+input.urlinput[type="text"] {
   width: 80%;
   padding: 10px;
   margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-.urlinput {
-  min-width: 600px;
 }
 
 .initial-message {
@@ -109,6 +96,7 @@ input[type="text"] {
   text-align: center;
 }
 
+/* Chat Message Styles */
 .chat-message {
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -133,4 +121,44 @@ code {
   background-color: #7300ff;
   color: #fff;
   text-align: right;
+}
+
+/* Button Styles */
+input[type="button"] {
+  padding: 14px;
+  margin: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  flex-grow: 1;
+  padding: 10px;
+  margin: 8px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  width: 100%;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background-color: #0D3B66;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #135ba0;
+}
+
+.btn-secondary {
+  background-color: #8C2F39;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #d13444;
 }
