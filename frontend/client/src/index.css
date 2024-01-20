@@ -126,6 +126,8 @@ code {
 /* Button Styles */
 input[type="button"] {
   padding: 14px;
+  padding-left: 80px;
+  padding-right: 80px;
   margin: 8px;
   border: none;
   border-radius: 8px;
