@@ -8,7 +8,6 @@ class ChatMessageParams(BaseModel):
 
 class InitiateChatParams(BaseModel):
     subject: str
-    course_code: str
 
 
 class HTTPErrorResponse(BaseModel):

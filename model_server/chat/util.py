@@ -1,6 +1,7 @@
 from uuid import uuid4
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from sqlalchemy import and_
+from datetime import datetime
 from langchain.schema import HumanMessage, AIMessage
 from model_server.database.database_models import Chat, ChatMessage
 from model_server.config import logging_level
@@ -22,9 +23,9 @@ def get_system_prompt():
     return prompt
 
 
-def create_or_get_chat_in_db(uid: str, db: Session):
+def create_or_get_chat_in_db(uid: str, course_code: str, db: Session):
     try:
-        chat = db.query(Chat).filter(Chat.user_id == uid).first()  # type: ignore
+        chat = db.query(Chat).filter(and_(Chat.user_id == uid, Chat.course_code == course_code)).first()  # type: ignore
 
         if chat is not None:
             return chat.id
@@ -36,6 +37,7 @@ def create_or_get_chat_in_db(uid: str, db: Session):
                 id=str(uuid4()),
                 time=datetime.now(),
                 user_id=uid,
+                course_code=course_code
             )  # type: ignore
 
     db.add(new_chat)

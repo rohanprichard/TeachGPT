@@ -26,6 +26,7 @@ from model_server.config import cfg, logging_level
 from model_server.database.database import get_db
 from model_server.database.database_models import ChatMessage, User
 from model_server.deps import get_current_user
+from model_server.embedding.model import GetCourseParams
 from model_server.prompts.util import get_system_prompt
 from model_server.embedding.embed import embedder
 
@@ -183,12 +184,12 @@ class BaseChatBot:
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
+        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=params.subject), db)
         self.logger.debug(f"Starting to initiate chat for user {user.id}")
-        chat_id = create_or_get_chat_in_db(user.id, db)
+        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
         self.logger.debug("Got chat")
         self.chat_history = get_all_chat_messages(str(chat_id), db)
         self.logger.debug("Got message")
-        self.course_code = params.course_code
         self.ctx = get_system_prompt("user_ctx.txt").format(
             user_name=user.name,
             user_gender=user.gender,

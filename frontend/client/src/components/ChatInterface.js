@@ -13,20 +13,15 @@ function ChatInterface({ accessToken }) {
 
   useEffect(scrollToBottom, [messages]);
 
-  const init_body = {
-    "subject": "C# programming",
-    "course_code":"20CS2010"
-}
+
 
 
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
         const init_body = {
-          "subject": "C# programming",
-          "course_code":"20CS2010"
+          "subject": "C# and .NET Programming",
       }
-
       const response = await fetch('http://localhost:4000/chat/initiate', {
         method: 'POST',
         headers: {
@@ -86,7 +81,7 @@ function ChatInterface({ accessToken }) {
         messages.length === 0 
           && 
         <div className="chat-message bot-message">
-          <p className="initial-message">Hi! I'm here to help you study! Ask me anything you want about {init_body.subject}</p>
+          <p className="initial-message">Hi! I'm here to help you study! Ask me anything you want about INSERT SUBJECT. </p>
         </div>
       }
       <div className="chat-messages">
