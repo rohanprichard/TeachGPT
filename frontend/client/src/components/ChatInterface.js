@@ -14,8 +14,6 @@ function ChatInterface({ accessToken }) {
   useEffect(scrollToBottom, [messages]);
 
 
-
-
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
@@ -63,7 +61,7 @@ function ChatInterface({ accessToken }) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}` 
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify(body),
     });

@@ -77,7 +77,7 @@ class Embedder:
             },
         )
 
-        ### DEPRECATED
+        # DEPRECATED
         # self.router.add_api_route(
         #     "/courses/get_code",
         #     endpoint=self.get_course_code,

@@ -4,6 +4,7 @@ from typing import List, Dict
 
 class ChatMessageParams(BaseModel):
     message: str
+    subject: str
 
 
 class InitiateChatParams(BaseModel):

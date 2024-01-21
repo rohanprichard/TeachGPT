@@ -21,7 +21,7 @@ from model_server.chat.model import (
     ChatMessageResult,
     ChatMessageParams,
 )
-from model_server.chat.util import create_or_get_chat_in_db, get_all_chat_messages
+from model_server.chat.util import create_or_get_chat_in_db, get_all_chat_messages, get_chat_in_db
 from model_server.config import cfg, logging_level
 from model_server.database.database import get_db
 from model_server.database.database_models import ChatMessage, User
@@ -113,7 +113,17 @@ class BaseChatBot:
         db: Session = Depends(get_db)
     ) -> ChatMessageResult:
 
-        chat_id = create_or_get_chat_in_db(user.id, db)
+        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=chat_message.subject), db)
+        self.logger.info(f"Got course code: {self.course_code}")
+        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
+
+        self.chat_history: List[HumanMessage | AIMessage] = get_all_chat_messages(str(chat_id), db)
+
+        self.chat_history = self.chat_history[-20:]
+        if len(self.chat_history) > 0:
+            if isinstance(self.chat_history[0], AIMessage):
+                self.chat_history: List[HumanMessage | AIMessage] = [HumanMessage(content="")] + self.chat_history
+
         self.chat_history.append(HumanMessage(content=chat_message.message))
 
         self.logger.info(f"user chat: {chat_message.message}")
@@ -160,7 +170,7 @@ class BaseChatBot:
             is_opener=False
         )  # type: ignore
 
-        time.sleep(1)
+        time.sleep(0.5)
 
         bot_message = ChatMessage(
             id=str(uuid4()),

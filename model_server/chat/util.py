@@ -48,6 +48,16 @@ def create_or_get_chat_in_db(uid: str, course_code: str, db: Session):
     return new_chat.id
 
 
+def get_chat_in_db(uid: str, db: Session):
+    try:
+        chat = db.query(Chat).filter(and_(Chat.user_id == uid)).first()  # type: ignore
+
+        if chat is not None:
+            return chat.id
+    except Exception:
+        pass
+
+
 def get_all_chat_messages(chat_id: str, db: Session):
 
     messages = (
