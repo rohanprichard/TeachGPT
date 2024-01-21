@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
 
 
 class ExtractionResult(BaseModel):
@@ -7,4 +7,13 @@ class ExtractionResult(BaseModel):
 
 
 class DocumentResult(BaseModel):
-    result: List[Dict]
+    result: List
+
+
+class AddSubjectParams(BaseModel):
+    course_code: str
+    subject_name: str
+
+
+class GetCourseParams(BaseModel):
+    subject_name: str

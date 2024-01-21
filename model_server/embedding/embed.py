@@ -8,12 +8,12 @@ from typing import List
 import chromadb
 import logging
 
-from model_server.database.database_models import Document, User
+from model_server.database.database_models import Course, Document, User
 from model_server.chat.model import HTTPErrorResponse
 from model_server.database.database import get_db
 from model_server.deps import get_current_user
 from model_server.config import logging_level
-from .model import DocumentResult, ExtractionResult
+from .model import DocumentResult, ExtractionResult, AddSubjectParams, GetCourseParams
 from .util import pdf_extraction_alg, pptx_extraction_alg
 
 
@@ -52,6 +52,43 @@ class Embedder:
                 404: {"model": HTTPErrorResponse}
             },
         )
+
+        self.router.add_api_route(
+            "/courses",
+            endpoint=self.get_all_subjects,
+            methods=["GET"],
+            responses={
+                200: {"model": DocumentResult},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+                404: {"model": HTTPErrorResponse}
+            },
+        )
+
+        self.router.add_api_route(
+            "/courses/add",
+            endpoint=self.add_subject,
+            methods=["POST"],
+            responses={
+                200: {"model": DocumentResult},
+                401: {"model": HTTPErrorResponse},
+                403: {"model": HTTPErrorResponse},
+                404: {"model": HTTPErrorResponse}
+            },
+        )
+
+        # DEPRECATED
+        # self.router.add_api_route(
+        #     "/courses/get_code",
+        #     endpoint=self.get_course_code,
+        #     methods=["POST"],
+        #     responses={
+        #         200: {"model": DocumentResult},
+        #         401: {"model": HTTPErrorResponse},
+        #         403: {"model": HTTPErrorResponse},
+        #         404: {"model": HTTPErrorResponse}
+        #     },
+        # )
 
         # self.router.add_api_route(
         #     "/test",
@@ -182,6 +219,39 @@ class Embedder:
     ):
         result = db.query(Document).all()
         return result
+
+    def get_all_subjects(
+        self,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+    ):
+        result = db.query(Course).all()
+        response = [course.subject_name for course in result]
+        return {"courses": response}
+
+    def add_subject(
+        self,
+        params: AddSubjectParams,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+    ):
+        db.add(Course(
+            id=params.course_code,
+            subject_name=params.subject_name
+        ))  # type: ignore
+        db.commit()
+        return {"message": "success"}
+
+    def get_course_code(
+        self,
+        params: GetCourseParams,
+        db: Session,
+        user: User = Depends(get_current_user)
+    ):
+        result = db.query(Course).filter(Course.subject_name == params.subject_name).first()  # type: ignore
+        if result is None:
+            return ""
+        return result.id
 
 
 embedder = Embedder()

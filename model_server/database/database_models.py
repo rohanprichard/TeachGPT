@@ -31,6 +31,7 @@ class Chat(Base):
     user_id = Column(String, ForeignKey("users.id"))
     messages = relationship("ChatMessage", back_populates="chat")
     user = relationship("User", back_populates="chats")
+    course_code = Column(String, ForeignKey("courses.id"))
 
 
 class ChatMessage(Base):
@@ -49,5 +50,11 @@ class Document(Base):
     id = Column(String, primary_key=True)
     added_at = Column(DateTime)
     user_id = Column(String, ForeignKey("users.id"))
-    course_code = Column(String)
+    course_code = Column(String, ForeignKey("courses.id"))
     document_name = Column(String)
+
+
+class Course(Base):
+    __tablename__ = "courses"
+    id = Column(String, primary_key=True)
+    subject_name = Column(String, unique=True)

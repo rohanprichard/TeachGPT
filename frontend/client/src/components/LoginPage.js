@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './Login.css';
 
 const Login = ({ onLoginSuccess }) => {
   const [isRegistering, setRegistering] = useState(false);
@@ -13,8 +12,15 @@ const Login = ({ onLoginSuccess }) => {
   const [registrationPwd, setRegistrationPwd] = useState('');
   const [department, setDepartment] = useState('');
   const [year, setYear] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
+
+    if (!uname || !pwd) {
+      setError('Enter both username and password to proceed');
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:4000/client/login", {
         method: "POST",
@@ -33,6 +39,8 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess(accessToken);
       } else {
         console.error("Login failed");
+        setError('Incorrect credentials. Please try again');
+        return;
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -40,6 +48,25 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   const handleRegistration = async () => {
+
+    if (!name || !email || !gender || !registrationPwd || !department || !year) {
+      console.log(name, email, gender, registrationPwd, department, year)
+      setError('All fields are required.');
+      return;
+    }
+
+    if (registrationPwd.length < 5) {
+      setError('Password must be at least 5 characters.');
+      return;
+    }
+
+    // Add email validation logic here (ends with '@karunya.edu' or '@karunya.edu.in')
+    const emailRegex = /@(karunya\.edu|karunya\.edu\.in)$/;
+    if (!email.match(emailRegex)) {
+      setError('Invalid email format. Use your KMail');
+      return;
+    }
+
     // Handle registration logic
     try {
       const registrationData = {
@@ -84,52 +111,95 @@ const Login = ({ onLoginSuccess }) => {
       console.error("Error during registration:", error);
     }
   };
+
   return (
-    <div>
-      {isRegistering ? (
-        <div>
-          {/* Registration fields */}
-          <br/>
-          <label>Name:</label>
-          <br/>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-          <br/>
-          <label>Email:</label><br/>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <br/>
-          <label>Gender:</label><br/>
-          <input type="text" value={gender} onChange={(e) => setGender(e.target.value)} />
-          <br/>
-          <label>Password:</label><br/>
-          <input type="password" value={registrationPwd} onChange={(e) => setRegistrationPwd(e.target.value)} />
-          <br/>
-          <label>Department:</label><br/>
-          <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} />
-          <br/>
-          <label>Year:</label><br/>
-          <input type="text" value={year} onChange={(e) => setYear(e.target.value)} />
-          <br/>
-          <button onClick={handleRegistration}>Register</button>
-          <button onClick={() => setRegistering(false)}>Cancel</button>
+    <div className="container mt-4">
+      <div className="card">
+        <div className="card-body">
+          {isRegistering ? (
+            <>
+              <h1 className="card-title">Registration</h1>
+              <form>
+                {/* Display error message if there's any */}
+                {error && <div id="error-div">
+                  {<p className="text-danger"><b>{error}</b></p>}
+                </div>}
+                {/* Registration fields */}
+                <div className="form-group">
+                  <label>Name:</label>
+                  <br/><input className="form-control" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Email:</label>
+                  <br/><input className="form-control" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Gender:</label>
+                  <br/><input className="form-control" type="text" value={gender} onChange={(e) => setGender(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Password:</label>
+                  <br/><input className="form-control" type="password" value={registrationPwd} onChange={(e) => setRegistrationPwd(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Department:</label>
+                  {/* <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} /> */}
+                  <br/><select className="form-control" value={department} onChange={(e) => setDepartment(e.target.value)}>
+                    <option value="Computer Science and Engineering">CSE</option>
+                    <option value="Electronics and Communications Engineering">ECE</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Physics">Physics</option>
+                  {/* Add more options as needed */}
+                </select>
+                </div>
+                <div className="form-group">
+                  <label>Year:</label>
+                  {/* <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} /> */}
+                  <br/><select className="form-control" value={year} onChange={(e) => setYear(e.target.value)}>
+                  <option value="First Year">First Year</option>
+                  <option value="Second Year">Second Year</option>
+                  <option value="Third Year">Third Year</option>
+                  <option value="Fourth Year">Fourth Year</option>
+                  <option value="Master's Student">Master's Student</option>
+                  <option value="Ph.D. Scholar">Ph.D. Scholar</option>
+                  <option value="Faculty">Faculty</option>
+                </select>
+                </div>
+                <br/>
+                {/* Add similar styling for other registration fields */}
+                <input type="button" className="btn btn-primary mr-2" value="Register" onClick={handleRegistration} />
+                <input type="button" className="btn btn-secondary" value="Cancel" onClick={() => {setRegistering(false); setError('');}} />
+              </form>
+            </>
+          ) : (
+            <>
+              <h1 className="card-title">Login</h1>
+              <form>
+                {/* Display error message if there's any */}
+                {error && <div id="error-div">
+                  {<p className="text-danger"><b>{error}</b></p>}
+                </div>}
+                {/* Login fields */}
+                <div className="form-group">
+                  <label>Username:</label>
+                  <br/><input className="form-control" type="text" value={uname} onChange={(e) => setUname(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Password:</label>
+                  <br/><input className="form-control" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} />
+                </div>
+                <br/>
+                {/* Add similar styling for other login fields */}
+                <input type="button" className="btn btn-primary mr-2" value="Login" onClick={handleLogin} />
+                <input type="button" className="btn btn-secondary mr-2" value="Register" onClick={() => { setRegistering(true); setError(''); }} />
+              </form>
+            </>
+          )}
         </div>
-      ) : (
-        <div>
-          {/* Login fields */}
-          <br/>
-          <label>Username:</label>
-          <br/>
-          <input type="text" value={uname} onChange={(e) => setUname(e.target.value)} />
-          <br/>
-          <label>Password:</label><br/>
-          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} />
-          <br/>
-          <button onClick={handleLogin}>Login</button>
-          <button onClick={() => setRegistering(true)}>Register</button>
-        </div>
-      )}
+      </div>
     </div>
-  );
-  
+  );  
+
 };
 
 export default Login;

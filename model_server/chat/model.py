@@ -4,11 +4,11 @@ from typing import List, Dict
 
 class ChatMessageParams(BaseModel):
     message: str
+    subject: str
 
 
 class InitiateChatParams(BaseModel):
     subject: str
-    course_code: str
 
 
 class HTTPErrorResponse(BaseModel):

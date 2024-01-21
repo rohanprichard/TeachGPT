@@ -26,6 +26,7 @@ from model_server.config import cfg, logging_level
 from model_server.database.database import get_db
 from model_server.database.database_models import ChatMessage, User
 from model_server.deps import get_current_user
+from model_server.embedding.model import GetCourseParams
 from model_server.prompts.util import get_system_prompt
 from model_server.embedding.embed import embedder
 
@@ -112,7 +113,17 @@ class BaseChatBot:
         db: Session = Depends(get_db)
     ) -> ChatMessageResult:
 
-        chat_id = create_or_get_chat_in_db(user.id, db)
+        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=chat_message.subject), db)
+        self.logger.info(f"Got course code: {self.course_code}")
+        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
+
+        self.chat_history: List[HumanMessage | AIMessage] = get_all_chat_messages(str(chat_id), db)
+
+        self.chat_history = self.chat_history[-20:]
+        if len(self.chat_history) > 0:
+            if isinstance(self.chat_history[0], AIMessage):
+                self.chat_history: List[HumanMessage | AIMessage] = [HumanMessage(content="")] + self.chat_history
+
         self.chat_history.append(HumanMessage(content=chat_message.message))
 
         self.logger.info(f"user chat: {chat_message.message}")
@@ -159,7 +170,7 @@ class BaseChatBot:
             is_opener=False
         )  # type: ignore
 
-        time.sleep(1)
+        time.sleep(0.5)
 
         bot_message = ChatMessage(
             id=str(uuid4()),
@@ -183,12 +194,13 @@ class BaseChatBot:
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
+        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=params.subject), db)
+        self.logger.info(f"Got course code: {self.course_code}")
         self.logger.debug(f"Starting to initiate chat for user {user.id}")
-        chat_id = create_or_get_chat_in_db(user.id, db)
+        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
         self.logger.debug("Got chat")
         self.chat_history = get_all_chat_messages(str(chat_id), db)
         self.logger.debug("Got message")
-        self.course_code = params.course_code
         self.ctx = get_system_prompt("user_ctx.txt").format(
             user_name=user.name,
             user_gender=user.gender,
