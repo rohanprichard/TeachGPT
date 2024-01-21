@@ -62,7 +62,7 @@ const Login = ({ onLoginSuccess }) => {
     // Add email validation logic here (ends with '@karunya.edu' or '@karunya.edu.in')
     const emailRegex = /@(karunya\.edu|karunya\.edu\.in)$/;
     if (!email.match(emailRegex)) {
-      setError('Invalid email format. Use @karunya.edu or @karunya.edu.in');
+      setError('Invalid email format. Use your KMail');
       return;
     }
 
@@ -121,7 +121,7 @@ const Login = ({ onLoginSuccess }) => {
               <form>
                 {/* Display error message if there's any */}
                 {error && <div id="error-div">
-                  {<p className="text-danger"><b>**{error}**</b></p>}
+                  {<p className="text-danger"><b>{error}</b></p>}
                 </div>}
                 {/* Registration fields */}
                 <div className="form-group">
@@ -142,11 +142,27 @@ const Login = ({ onLoginSuccess }) => {
                 </div>
                 <div className="form-group">
                   <label>Department:</label>
-                  <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} />
+                  {/* <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} /> */}
+                  <br/><select className="form-control" value={department} onChange={(e) => setDepartment(e.target.value)}>
+                    <option value="Computer Science and Engineering" default>CSE</option>
+                    <option value="Electronics and Communications Engineering">ECE</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Physics">Physics</option>
+                  {/* Add more options as needed */}
+                </select>
                 </div>
                 <div className="form-group">
                   <label>Year:</label>
-                  <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} />
+                  {/* <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} /> */}
+                  <br/><select className="form-control" value={year} onChange={(e) => setYear(e.target.value)}>
+                  <option value="First Year" default>First Year</option>
+                  <option value="Second Year">Second Year</option>
+                  <option value="Third Year">Third Year</option>
+                  <option value="Fourth Year">Fourth Year</option>
+                  <option value="Master's Student">Master's Student</option>
+                  <option value="Ph.D. Scholar">Ph.D. Scholar</option>
+                  <option value="Faculty">Faculty</option>
+                </select>
                 </div>
                 <br/>
                 {/* Add similar styling for other registration fields */}
@@ -160,7 +176,7 @@ const Login = ({ onLoginSuccess }) => {
               <form>
                 {/* Display error message if there's any */}
                 {error && <div id="error-div">
-                  {<p className="text-danger"><b>**{error}**</b></p>}
+                  {<p className="text-danger"><b>{error}</b></p>}
                 </div>}
                 {/* Login fields */}
                 <div className="form-group">
