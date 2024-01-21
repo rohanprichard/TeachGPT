@@ -4,8 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 
 function ChatInterface({ accessToken }) {
+
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [subjects, setSubjects] = useState([]);
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -13,13 +16,33 @@ function ChatInterface({ accessToken }) {
 
   useEffect(scrollToBottom, [messages]);
 
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/embed/courses', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+        });
+
+        const data = await response.json();
+        setSubjects(data.courses);
+      } catch (error) {
+        console.error('Error fetching subjects:', error);
+      }
+    };
+  
+    fetchSubjects();
+  }, [accessToken]);
+
 
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
         const init_body = {
-          "subject": "C# and .NET Programming",
-      }
+          subject: selectedSubject,
+        };
       const response = await fetch('http://localhost:4000/chat/initiate', {
         method: 'POST',
         headers: {
@@ -44,7 +67,7 @@ function ChatInterface({ accessToken }) {
     };
 
     fetchInitialMessages();
-  }, [accessToken]);
+  }, [accessToken, selectedSubject]);
 
 
   const handleSendMessage = async (event) => {
@@ -53,6 +76,7 @@ function ChatInterface({ accessToken }) {
     const userMessage = { text: inputText, isBot: false };
     const body = {
       message: inputText,
+      subject: selectedSubject
     }    
     setMessages([...messages, userMessage]);
     setInputText('');
@@ -71,10 +95,23 @@ function ChatInterface({ accessToken }) {
     setMessages(currentMessages => [...currentMessages, botMessage]);
   };
 
+  const handleSubjectChange = (event) => {
+    setSelectedSubject(event.target.value);
+  };
 
   return (
     <div className="chat-container">
-      <header className="chat-header"><h2>The Socratic Method</h2></header>
+      <header className="chat-header">
+        <h2>The Socratic Method</h2>
+        <select id="subjectSelect" value={selectedSubject} onChange={handleSubjectChange}>
+          <option value="" disabled>Select a subject</option>
+            {subjects.map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+        </select>
+      </header>
       {
         messages.length === 0 
           && 
@@ -88,7 +125,7 @@ function ChatInterface({ accessToken }) {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form className="chat-input" onSubmit={handleSendMessage} autocomplete="off">
+      <form className="chat-input" onSubmit={handleSendMessage} autoComplete="off">
         <input
           id="in"
           type="text"

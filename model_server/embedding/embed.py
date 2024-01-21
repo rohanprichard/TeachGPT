@@ -220,10 +220,14 @@ class Embedder:
         result = db.query(Document).all()
         return result
 
-    def get_all_subjects(self, db: Session = Depends(get_db)):
+    def get_all_subjects(
+        self,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+    ):
         result = db.query(Course).all()
         response = [course.subject_name for course in result]
-        return response
+        return {"courses": response}
 
     def add_subject(
         self,
