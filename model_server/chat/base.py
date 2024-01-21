@@ -21,7 +21,7 @@ from model_server.chat.model import (
     ChatMessageResult,
     ChatMessageParams,
 )
-from model_server.chat.util import create_or_get_chat_in_db, get_all_chat_messages, get_chat_in_db
+from model_server.chat.util import create_or_get_chat_in_db, get_all_chat_messages
 from model_server.config import cfg, logging_level
 from model_server.database.database import get_db
 from model_server.database.database_models import ChatMessage, User
@@ -195,6 +195,7 @@ class BaseChatBot:
         db: Session = Depends(get_db)
     ):
         self.course_code = embedder.get_course_code(GetCourseParams(subject_name=params.subject), db)
+        self.logger.info(f"Got course code: {self.course_code}")
         self.logger.debug(f"Starting to initiate chat for user {user.id}")
         chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
         self.logger.debug("Got chat")
