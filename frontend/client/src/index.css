@@ -47,7 +47,7 @@ body, html {
   border-radius: 0;
 }
 
-.chat-input input {
+.chat-input #in {
   width: 700px;
   background-color: #fcfbf4;
   flex-grow: 1;
@@ -113,8 +113,10 @@ input.urlinput[type="text"] {
   overflow-wrap: break-word;
   white-space: normal;  
   padding: 13px;
+  padding-left: 20px;
+  padding-right: 20px;
   border-radius: 5px;
-  /* margin-bottom: 10px;  */
+  margin-bottom: 15px; 
 }
 
 .bot-message {
@@ -123,9 +125,15 @@ input.urlinput[type="text"] {
   box-shadow: 0 0 10px rgba(164, 145, 0, 0.2);
 }
 
-code {
-  font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;;
+pre{
+  border-radius: 8px;
+  background-color: #404040;
+  color: #fcfbf4;
+  padding: 20px;
+
   white-space : pre-wrap !important;
+  padding-left: 20px;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .user-message {
@@ -136,17 +144,18 @@ code {
 }
 
 /* Button Styles */
-card input[type="button"] {
+input[type="button"] {
   padding: 14px;
-  padding-left: 80px;
-  padding-right: 80px;
+  width: 150px;
+  /* padding-left: 80px;
+  padding-right: 80px; */
   margin: 8px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
 
-card input[type="text"],
+input[type="text"],
 input[type="email"],
 input[type="password"] {
   flex-grow: 1;
@@ -164,19 +173,33 @@ label{
 }
 
 .btn-primary {
-  background-color: #0D3B66;
+  background-color: #135ba0;
   color: #fff;
 }
 
 .btn-primary:hover {
-  background-color: #135ba0;
+  background-color: #0D3B66;
 }
 
 .btn-secondary {
-  background-color: #8C2F39;
+  background-color: #d13444;
   color: white;
 }
 
 .btn-secondary:hover {
-  background-color: #d13444;
+  background-color: #8C2F39;
+}
+
+.card-title{
+  text-align: center;
+}
+
+#error-div{
+  background-color: #fadddd;
+  border-radius: 8px;
+  color: #d13444;
+  padding: 4px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 15px;
 }

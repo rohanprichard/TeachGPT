@@ -27,9 +27,7 @@ def create_or_get_chat_in_db(uid: str, db: Session):
         chat = db.query(Chat).filter(Chat.user_id == uid).first()  # type: ignore
 
         if chat is not None:
-            if (datetime.now() - chat.time) < timedelta(hours=1):
-                logger.debug(f"found chat with id: {chat.id}")
-                return chat.id
+            return chat.id
 
     except Exception:
         pass
@@ -40,10 +38,10 @@ def create_or_get_chat_in_db(uid: str, db: Session):
                 user_id=uid,
             )  # type: ignore
 
-    logger.debug(f"created new chat with id: {new_chat.id}")
-
     db.add(new_chat)
     db.commit()
+
+    logger.debug(f"created new chat with id: {new_chat.id}")
 
     return new_chat.id
 

@@ -12,8 +12,15 @@ const Login = ({ onLoginSuccess }) => {
   const [registrationPwd, setRegistrationPwd] = useState('');
   const [department, setDepartment] = useState('');
   const [year, setYear] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
+
+    if (!uname || !pwd) {
+      setError('Enter both username and password to proceed');
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:4000/client/login", {
         method: "POST",
@@ -32,6 +39,8 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess(accessToken);
       } else {
         console.error("Login failed");
+        setError('Incorrect credentials. Please try again');
+        return;
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -39,6 +48,24 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   const handleRegistration = async () => {
+
+    if (!name || !email || !gender || !registrationPwd || !department || !year) {
+      setError('All fields are required.');
+      return;
+    }
+
+    if (registrationPwd.length < 5) {
+      setError('Password must be at least 5 characters.');
+      return;
+    }
+
+    // Add email validation logic here (ends with '@karunya.edu' or '@karunya.edu.in')
+    const emailRegex = /@(karunya\.edu|karunya\.edu\.in)$/;
+    if (!email.match(emailRegex)) {
+      setError('Invalid email format. Use @karunya.edu or @karunya.edu.in');
+      return;
+    }
+
     // Handle registration logic
     try {
       const registrationData = {
@@ -83,6 +110,7 @@ const Login = ({ onLoginSuccess }) => {
       console.error("Error during registration:", error);
     }
   };
+
   return (
     <div className="container mt-4">
       <div className="card">
@@ -91,40 +119,50 @@ const Login = ({ onLoginSuccess }) => {
             <>
               <h1 className="card-title">Registration</h1>
               <form>
+                {/* Display error message if there's any */}
+                {error && <div id="error-div">
+                  {<p className="text-danger"><b>**{error}**</b></p>}
+                </div>}
                 {/* Registration fields */}
                 <div className="form-group">
-                <label>Name:</label>
-                <br/><input className="form-control" type="text" value={name} onChange={(e) => setName(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Email:</label>
-                <br/><input className="form-control" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Gender:</label>
-                <br/><input className="form-control" type="text" value={gender} onChange={(e) => setGender(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Password:</label>
-                <br/><input className="form-control" type="password" value={registrationPwd} onChange={(e) => setRegistrationPwd(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Department:</label>
-                <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Year:</label>
-                <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} />
-              </div> <br/>
+                  <label>Name:</label>
+                  <br/><input className="form-control" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Email:</label>
+                  <br/><input className="form-control" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Gender:</label>
+                  <br/><input className="form-control" type="text" value={gender} onChange={(e) => setGender(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Password:</label>
+                  <br/><input className="form-control" type="password" value={registrationPwd} onChange={(e) => setRegistrationPwd(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Department:</label>
+                  <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Year:</label>
+                  <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} />
+                </div>
+                <br/>
                 {/* Add similar styling for other registration fields */}
                 <input type="button" className="btn btn-primary mr-2" value="Register" onClick={handleRegistration} />
-                <input type="button" className="btn btn-secondary" value="Cancel" onClick={() => setRegistering(false)} />
+                <input type="button" className="btn btn-secondary" value="Cancel" onClick={() => {setRegistering(false); setError('');}} />
               </form>
             </>
           ) : (
             <>
               <h1 className="card-title">Login</h1>
               <form>
+                {/* Display error message if there's any */}
+                {error && <div id="error-div">
+                  {<p className="text-danger"><b>**{error}**</b></p>}
+                </div>}
+                {/* Login fields */}
                 <div className="form-group">
                   <label>Username:</label>
                   <br/><input className="form-control" type="text" value={uname} onChange={(e) => setUname(e.target.value)} />
@@ -132,16 +170,18 @@ const Login = ({ onLoginSuccess }) => {
                 <div className="form-group">
                   <label>Password:</label>
                   <br/><input className="form-control" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} />
-                </div><br/>
+                </div>
+                <br/>
+                {/* Add similar styling for other login fields */}
                 <input type="button" className="btn btn-primary mr-2" value="Login" onClick={handleLogin} />
-                <input type="button" className="btn btn-secondary mr-2" value="Register" onClick={() => setRegistering(true)} />
-            </form>
+                <input type="button" className="btn btn-secondary mr-2" value="Register" onClick={() => { setRegistering(true); setError(''); }} />
+              </form>
             </>
           )}
         </div>
       </div>
     </div>
-  );
+  );  
 
 };
 

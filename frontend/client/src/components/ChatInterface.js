@@ -95,7 +95,7 @@ function ChatInterface({ accessToken }) {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form className="chat-input" onSubmit={handleSendMessage}>
+      <form className="chat-input" onSubmit={handleSendMessage} autocomplete="off">
         <input
           id="in"
           type="text"
