@@ -73,11 +73,12 @@ function ChatInterface({ accessToken }) {
   const handleSendMessage = async (event) => {
     event.preventDefault();
     if (!inputText.trim()) return; // Prevent sending empty messages
+    if (selectedSubject === '') return
     const userMessage = { text: inputText, isBot: false };
     const body = {
       message: inputText,
       subject: selectedSubject
-    }    
+    }
     setMessages([...messages, userMessage]);
     setInputText('');
 

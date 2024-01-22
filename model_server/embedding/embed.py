@@ -204,7 +204,7 @@ class Embedder:
 
         if len(results['distances'][0]) != 0:  # type: ignore
             self.logger.debug(f"Confidence: {results}")
-            if results['distances'][0][0] > 0.3:  # type: ignore
+            if results['distances'][0][0] < 0.7:  # type: ignore
                 return (
                     str(results['documents'][0][0]),  # type: ignore
                     str(results['metadatas'][0][0]['source'])  # type: ignore

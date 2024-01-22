@@ -106,6 +106,28 @@ class BaseChatBot:
         )
         self._init_api_routes()
 
+    def get_opener_message(self, chat_history):
+
+        self.logger.debug("getting history for opener message.")
+        messages: List[HumanMessage | AIMessage | SystemMessage] = [
+            SystemMessage(content=self._system_prompt.format(
+                user_context=self.ctx,
+                search_context="",
+                source="",
+                ))
+        ] + chat_history + [HumanMessage(
+            content="This message is invisible to the user. Do not acknowlege it. Generate an opener message based on all the conversation above to greet the user."
+        )]  # type: ignore
+
+        self.logger.debug("Generating opener message.")
+
+        result = self._model.predict_messages(
+            messages=messages,  # type: ignore
+            stop=["</s>"],
+            )
+
+        return result
+
     def get_prediction_with_ctx(
         self,
         chat_message: ChatMessageParams,
@@ -170,7 +192,7 @@ class BaseChatBot:
             is_opener=False
         )  # type: ignore
 
-        time.sleep(0.5)
+        time.sleep(0.1)
 
         bot_message = ChatMessage(
             id=str(uuid4()),
@@ -200,7 +222,7 @@ class BaseChatBot:
         chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
         self.logger.debug("Got chat")
         self.chat_history = get_all_chat_messages(str(chat_id), db)
-        self.logger.debug("Got message")
+        self.logger.debug("Got messages")
         self.ctx = get_system_prompt("user_ctx.txt").format(
             user_name=user.name,
             user_gender=user.gender,
@@ -208,7 +230,7 @@ class BaseChatBot:
             user_course=user.department,
             subject_request=params.subject,
         )
-
+        self.chat_history = self.chat_history + [self.get_opener_message(self.chat_history)]
         self.logger.info(
             f"Initiated with {len(self.chat_history)} existing messages"
         )

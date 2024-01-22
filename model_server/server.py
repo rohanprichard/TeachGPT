@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from model_server.chat.chat import chat
@@ -19,17 +20,8 @@ app = FastAPI()
 
 origins = ["*"]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 
-
-@app.get("/")
+@app.get("/ok")
 async def root(
     db: Session = Depends(get_db)
 ):
@@ -39,5 +31,16 @@ async def root(
 app.include_router(chat.router, prefix="/chat")
 app.include_router(embedder.router, prefix="/embed")
 app.include_router(client.router, prefix="/client")
+
+# app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="static")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
 
 Base.metadata.create_all(bind=engine)  # type: ignore
