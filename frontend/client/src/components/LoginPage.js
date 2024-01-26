@@ -145,6 +145,7 @@ const Login = ({ onLoginSuccess }) => {
                   <label>Department:</label>
                   {/* <br/><input className="form-control" type="text" value={department} onChange={(e) => setDepartment(e.target.value)} /> */}
                   <br/><select className="form-control" value={department} onChange={(e) => setDepartment(e.target.value)}>
+                    <option value="" default></option>
                     <option value="Computer Science and Engineering">CSE</option>
                     <option value="Electronics and Communications Engineering">ECE</option>
                     <option value="Biotechnology">Biotechnology</option>
@@ -156,6 +157,7 @@ const Login = ({ onLoginSuccess }) => {
                   <label>Year:</label>
                   {/* <br/><input className="form-control" type="text" value={year} onChange={(e) => setYear(e.target.value)} /> */}
                   <br/><select className="form-control" value={year} onChange={(e) => setYear(e.target.value)}>
+                  <option value="" default></option>
                   <option value="First Year">First Year</option>
                   <option value="Second Year">Second Year</option>
                   <option value="Third Year">Third Year</option>

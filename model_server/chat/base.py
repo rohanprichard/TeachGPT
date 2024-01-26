@@ -158,13 +158,12 @@ class BaseChatBot:
             self.course_code
         )
 
-        self.logger.debug(f"\nSearch ctx: {search_ctx}\n\nSource: {source}")
+        self.logger.debug(f"\nSearch ctx: {search_ctx}\nSource: {source}")
         self.messages = []
         self.messages: List[BaseMessage] = [
             SystemMessage(content=self._system_prompt.format(
                 user_context=self.ctx,
                 search_context=search_ctx,
-                source=source
                 ))
         ] + self.chat_history  # type: ignore
 
@@ -175,8 +174,7 @@ class BaseChatBot:
             messages=self.messages,  # type: ignore
             stop=["</s>"],
             )
-
-        self.chat_history.append(AIMessage(content=result.content))
+        self.chat_history.append(AIMessage(content=result.content + f"\nYou can find more information in {source}" if source is not None else ""))  # type: ignore
         self.logger.info(
             f"ai response: {result.content}\n \
             Prediction took: {datetime.now()-t}"
@@ -208,7 +206,7 @@ class BaseChatBot:
 
         db.commit()
 
-        return ChatMessageResult(message=str(result.content))
+        return ChatMessageResult(message=str(result.content) + f"\nYou can find more information in {source}." if source is not None else "")
 
     def initiate_chat(
         self,

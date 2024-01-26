@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI
-from fastapi.staticfiles import StaticFiles
+# from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from model_server.chat.chat import chat

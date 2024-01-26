@@ -9,6 +9,7 @@ function ChatInterface({ accessToken }) {
   const [inputText, setInputText] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [subjects, setSubjects] = useState([]);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,7 +74,6 @@ function ChatInterface({ accessToken }) {
   const handleSendMessage = async (event) => {
     event.preventDefault();
     if (!inputText.trim()) return; // Prevent sending empty messages
-    if (selectedSubject === '') return
     const userMessage = { text: inputText, isBot: false };
     const body = {
       message: inputText,
@@ -81,6 +81,7 @@ function ChatInterface({ accessToken }) {
     }
     setMessages([...messages, userMessage]);
     setInputText('');
+    setIsSending(true);
 
     const response = await fetch('http://localhost:4000/chat/', {
       method: 'POST',
@@ -94,6 +95,7 @@ function ChatInterface({ accessToken }) {
     const data = await response.json();
     const botMessage = { text: data.message, isBot: true };
     setMessages(currentMessages => [...currentMessages, botMessage]);
+    setIsSending(false);
   };
 
   const handleSubjectChange = (event) => {
@@ -105,7 +107,7 @@ function ChatInterface({ accessToken }) {
       <header className="chat-header">
         <h2>The Socratic Method</h2>
         <select id="subjectSelect" value={selectedSubject} onChange={handleSubjectChange}>
-          <option value="" disabled>Select a subject</option>
+          <option value="default">Default Chat</option>
             {subjects.map((subject) => (
               <option key={subject} value={subject}>
                 {subject}
@@ -113,13 +115,7 @@ function ChatInterface({ accessToken }) {
             ))}
         </select>
       </header>
-      {
-        messages.length === 0 
-          && 
-        <div className="chat-message bot-message">
-          <p className="initial-message">Hi! I'm here to help you study! Ask me anything you want about INSERT SUBJECT. </p>
-        </div>
-      }
+      
       <div className="chat-messages">
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
@@ -133,6 +129,7 @@ function ChatInterface({ accessToken }) {
           placeholder="Message..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          disabled={isSending}
         />
       </form>
       <div>

@@ -17,6 +17,8 @@ body, html {
 }
 
 .chat-header {
+  position: sticky;
+  top: 0;
   padding: 16px;
   padding-top: 0px;
   padding-bottom: 0px;
@@ -26,6 +28,8 @@ body, html {
   font-size: 20px;
   font-family: 'Garamond', Times, serif;
   display: flex;
+
+  box-sizing: border-box;
 }
 
 #subjectSelect{
@@ -48,6 +52,7 @@ body, html {
   width: 90%;
   max-width: 800px;
   overflow-x: hidden;
+  border-radius: 30px;
 }
 
 .chat-input {
@@ -128,7 +133,7 @@ input.urlinput[type="text"] {
   padding: 13px;
   padding-left: 20px;
   padding-right: 20px;
-  border-radius: 5px;
+  border-radius: 15px;
   margin-bottom: 15px; 
 }
 
