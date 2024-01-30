@@ -119,7 +119,7 @@ const Login = ({ onLoginSuccess }) => {
           {isRegistering ? (
             <>
               <h1 className="card-title">Registration</h1>
-              <form>
+              <form action='submit'>
                 {/* Display error message if there's any */}
                 {error && <div id="error-div">
                   {<p className="text-danger"><b>{error}</b></p>}
@@ -176,14 +176,14 @@ const Login = ({ onLoginSuccess }) => {
           ) : (
             <>
               <h1 className="card-title">Login</h1>
-              <form>
+              <form action='submit'>
                 {/* Display error message if there's any */}
                 {error && <div id="error-div">
                   {<p className="text-danger"><b>{error}</b></p>}
                 </div>}
                 {/* Login fields */}
                 <div className="form-group">
-                  <label>Username:</label>
+                  <label>Email:</label>
                   <br/><input className="form-control" type="text" value={uname} onChange={(e) => setUname(e.target.value)} />
                 </div>
                 <div className="form-group">

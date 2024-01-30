@@ -93,7 +93,7 @@ class BaseChatBot:
         else:
             self.logger.info("Using Fireworks")
             self._model = ChatFireworks(
-                model="accounts/fireworks/models/yi-34b-200k-capybara",
+                model="accounts/fireworks/models/mixtral-8x7b-instruct",  # "accounts/fireworks/models/yi-34b-200k-capybara",
                 model_kwargs={
                     "temperature": 0.4,
                     "max_tokens": 1000,
@@ -206,7 +206,7 @@ class BaseChatBot:
 
         db.commit()
 
-        return ChatMessageResult(message=str(result.content) + f"\nYou can find more information in {source}." if source is not None else "")
+        return ChatMessageResult(message=str(result.content) + (f"\n\nYou can find more information in {source}." if len(source) > 3 else ""))
 
     def initiate_chat(
         self,

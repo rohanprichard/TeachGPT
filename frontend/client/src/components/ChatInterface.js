@@ -116,12 +116,14 @@ function ChatInterface({ accessToken }) {
         </select>
       </header>
       
-      <div className="chat-messages">
-        {messages.map((message, index) => (
-          <ChatMessage key={index} message={message} />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+      
+        <div className="chat-messages">
+          {messages.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      
       <form className="chat-input" onSubmit={handleSendMessage} autoComplete="off">
         <input
           id="in"
