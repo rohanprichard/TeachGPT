@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
+import sys
 
 from model_server.config import cfg, logging_level
 
@@ -11,6 +12,12 @@ logging.basicConfig()
 logger.setLevel(logging_level)
 
 SQLALCHEMY_DATABASE_URL = (cfg["DB_URL"])
+
+if cfg["DEV"]:
+    __import__('pysqlite3')
+    logger.info("Swapping sqlite for ChromaDB fix")
+
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 logger.info("Starting SQL DB engine")
 
