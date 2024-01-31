@@ -16,7 +16,6 @@ SQLALCHEMY_DATABASE_URL = (cfg["DB_URL"])
 if cfg["DEV"]:
     __import__('pysqlite3')
     logger.info("Swapping sqlite for ChromaDB fix")
-
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 logger.info("Starting SQL DB engine")
