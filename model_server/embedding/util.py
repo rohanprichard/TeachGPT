@@ -17,7 +17,7 @@ async def pdf_extraction_alg(uploaded_file):
 
     unique_file_name = os.path.join(
         ROOT_DIRECTORY_PATH,
-        uploaded_file.filename
+        "/uploaded_documents/" + uploaded_file.filename
     )
     logger.debug(f"Extracting information from PDF: {str(uploaded_file.filename)}")
     contents = await uploaded_file.read()
@@ -34,8 +34,6 @@ async def pdf_extraction_alg(uploaded_file):
             content = page.extract_text()
             pdf_text.append(content)
 
-    os.remove(unique_file_name)
-
     logger.debug(f"Success! Deleting: {str(uploaded_file.filename)}")
 
     output_string = ''
@@ -50,7 +48,7 @@ async def pptx_extraction_alg(uploaded_file):
 
     unique_file_name = os.path.join(
         ROOT_DIRECTORY_PATH,
-        uploaded_file.filename
+        "/uploaded_documents/" + uploaded_file.filename
     )
     contents = await uploaded_file.read()
 
