@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI
-# from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from model_server.chat.chat import chat
@@ -32,7 +32,7 @@ app.include_router(chat.router, prefix="/chat")
 app.include_router(embedder.router, prefix="/embed")
 app.include_router(client.router, prefix="/client")
 
-# app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="static")
+app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="static")
 
 app.add_middleware(
     CORSMiddleware,

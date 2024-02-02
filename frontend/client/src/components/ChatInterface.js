@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
+import { apiUrl } from './apiConfig';
 
 function ChatInterface({ accessToken }) {
 
@@ -20,7 +21,7 @@ function ChatInterface({ accessToken }) {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await fetch('http://localhost:4000/embed/courses', {
+        const response = await fetch(`${apiUrl}/embed/courses`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -44,7 +45,7 @@ function ChatInterface({ accessToken }) {
         const init_body = {
           subject: selectedSubject,
         };
-      const response = await fetch('http://localhost:4000/chat/initiate', {
+      const response = await fetch(`${apiUrl}/chat/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ function ChatInterface({ accessToken }) {
     setInputText('');
     setIsSending(true);
 
-    const response = await fetch('http://localhost:4000/chat/', {
+    const response = await fetch(`${apiUrl}/chat/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
