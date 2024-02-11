@@ -206,7 +206,7 @@ class BaseChatBot:
 
         db.commit()
 
-        return ChatMessageResult(message=str(result.content) + (f"\n\nYou can find more information in {source}." if len(source) > 3 else ""))
+        return ChatMessageResult(message=str(result.content) + (f"\n\nYou can find more information in <p onClick={{getDocument}}>{source}.</p>" if len(source) > 3 else ""))
 
     def initiate_chat(
         self,

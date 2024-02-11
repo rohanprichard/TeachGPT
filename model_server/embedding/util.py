@@ -15,11 +15,16 @@ logger.setLevel(logging_level)
 
 async def pdf_extraction_alg(uploaded_file):
 
+    dirpath = os.path.join(ROOT_DIRECTORY_PATH, "documents", uploaded_file.filename[:8])
+
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+
     unique_file_name = os.path.join(
         ROOT_DIRECTORY_PATH,
-        "/uploaded_documents/" + uploaded_file.filename
+        "documents", uploaded_file.filename[:8], uploaded_file.filename[8:]
     )
-    logger.debug(f"Extracting information from PDF: {str(uploaded_file.filename)}")
+    logger.debug(f"Extracting information from PDF: {str(uploaded_file.filename)},")
     contents = await uploaded_file.read()
 
     with open(unique_file_name, 'wb') as destination_file:
@@ -48,7 +53,7 @@ async def pptx_extraction_alg(uploaded_file):
 
     unique_file_name = os.path.join(
         ROOT_DIRECTORY_PATH,
-        "/uploaded_documents/" + uploaded_file.filename
+        "uploaded_documents" + uploaded_file.filename
     )
     contents = await uploaded_file.read()
 

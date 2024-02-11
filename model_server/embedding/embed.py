@@ -1,5 +1,8 @@
+import os
+import shutil
+from fastapi.responses import FileResponse, StreamingResponse
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from fastapi import Depends, UploadFile, File
+from fastapi import Depends, Response, UploadFile, File
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -7,7 +10,7 @@ from uuid import uuid4
 from typing import List
 import chromadb
 import logging
-
+import traceback
 from model_server.database.database_models import Course, Document, User
 from model_server.chat.model import HTTPErrorResponse
 from model_server.database.database import get_db
@@ -15,6 +18,9 @@ from model_server.deps import get_current_user
 from model_server.config import logging_level
 from .model import DocumentResult, ExtractionResult, AddSubjectParams, GetCourseParams
 from .util import pdf_extraction_alg, pptx_extraction_alg
+
+
+ROOT_DIR = os.getcwd()
 
 
 class Embedder:
@@ -77,6 +83,12 @@ class Embedder:
             },
         )
 
+        self.router.add_api_route(
+            "/documents/{course_code}/{filename}",
+            endpoint=self.search_documents,
+            methods=["GET"]
+        )
+
         # DEPRECATED
         # self.router.add_api_route(
         #     "/courses/get_code",
@@ -114,7 +126,11 @@ class Embedder:
         result_list = []
         self.logger.debug(f"recieved {len(files)} files")
         for file in files:
-            result_dict = {}
+            result_dict = {
+                "filename": file.filename[8:],  # type: ignore
+                "course_code": file.filename[:8]  # type: ignore
+            }
+
             try:
                 if str(file.filename)[-4:] == ".pdf":
                     result = await pdf_extraction_alg(file)
@@ -126,11 +142,8 @@ class Embedder:
                     result = ""
                     self.logger.debug("Placeholder result selected")
 
-                result_dict = {
-                    "filename": file.filename[8:],  # type: ignore
-                    "content": result,  # f"{len(result)} characters",
-                    "course_code": file.filename[:8]  # type: ignore
-                }
+                result_dict["content"] = result
+
                 self.logger.debug(
                     f"extracted {len(result)} characters from {file.filename}"
                     )
@@ -149,6 +162,7 @@ class Embedder:
                 result_list.append(result_dict)
 
             except Exception:
+                self.logger.info(traceback.format_exc())
                 self.logger.error("Embedding error")
 
         return ExtractionResult(
@@ -252,6 +266,17 @@ class Embedder:
         if result is None:
             return ""
         return result.id
+
+    def search_documents(self, course_code, filename):
+        path = os.path.join(ROOT_DIR, "documents", course_code, filename)
+
+        if path[-3:] == "pdf":
+            response = FileResponse(path, media_type="application/pdf")
+        elif path[-4:] == "pptx":
+            response = FileResponse(path, media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+        else:
+            response = FileResponse(path, media_type="application/vnd.ms-powerpoint")
+        return response
 
 
 embedder = Embedder()

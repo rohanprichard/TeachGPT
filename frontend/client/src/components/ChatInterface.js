@@ -30,6 +30,7 @@ function ChatInterface({ accessToken }) {
 
         const data = await response.json();
         setSubjects(data.courses);
+        console.log(data.courses)
       } catch (error) {
         console.error('Error fetching subjects:', error);
       }
@@ -109,11 +110,13 @@ function ChatInterface({ accessToken }) {
         <h2>The Socratic Method</h2>
         <select id="subjectSelect" value={selectedSubject} onChange={handleSubjectChange}>
           <option value="default">Default Chat</option>
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
+            {
+              subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))
+            }
         </select>
       </header>
       
@@ -135,9 +138,6 @@ function ChatInterface({ accessToken }) {
           disabled={isSending}
         />
       </form>
-      <div>
-
-      </div>
     </div>
   );
 }
