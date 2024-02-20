@@ -106,12 +106,12 @@ class BaseChatBot:
         )
         self._init_api_routes()
 
-    def get_opener_message(self, chat_history):
+    def get_opener_message(self, chat_history, ctx):
 
         self.logger.debug("getting history for opener message.")
         messages: List[HumanMessage | AIMessage | SystemMessage] = [
             SystemMessage(content=self._system_prompt.format(
-                user_context=self.ctx,
+                user_context=ctx,
                 search_context="",
                 source="",
                 ))
@@ -135,46 +135,52 @@ class BaseChatBot:
         db: Session = Depends(get_db)
     ) -> ChatMessageResult:
 
-        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=chat_message.subject), db)
-        self.logger.info(f"Got course code: {self.course_code}")
-        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
+        course_code = embedder.get_course_code(GetCourseParams(subject_name=chat_message.subject), db)
+        self.logger.info(f"Got course code: {course_code}")
+        chat_id = create_or_get_chat_in_db(user.id, course_code, db)
 
-        self.chat_history: List[HumanMessage | AIMessage] = get_all_chat_messages(str(chat_id), db)
+        chat_history: List[HumanMessage | AIMessage] = get_all_chat_messages(str(chat_id), db)
 
-        self.chat_history = self.chat_history[-20:]
-        if len(self.chat_history) > 0:
-            if isinstance(self.chat_history[0], AIMessage):
-                self.chat_history: List[HumanMessage | AIMessage] = [HumanMessage(content="")] + self.chat_history
+        chat_history = chat_history[-20:]
+        if len(chat_history) > 0:
+            if isinstance(chat_history[0], AIMessage):
+                chat_history: List[HumanMessage | AIMessage] = [HumanMessage(content="")] + chat_history
 
-        self.chat_history.append(HumanMessage(content=chat_message.message))
+        chat_history.append(HumanMessage(content=chat_message.message))
 
         self.logger.info(f"user chat: {chat_message.message}")
         self.logger.info(
-            f"using {len(self.chat_history) - 1} messages as history"
+            f"using {len(chat_history) - 1} messages as history"
             )
 
         search_ctx, source = embedder.query(
             chat_message.message,
-            self.course_code
+            course_code
         )
-
+        ctx = get_system_prompt("user_ctx.txt").format(
+            user_name=user.name,
+            user_gender=user.gender,
+            user_year=user.year,
+            user_course=user.department,
+            subject_request=chat_message.subject,
+        )
         self.logger.debug(f"\nSearch ctx: {search_ctx}\nSource: {source}")
-        self.messages = []
-        self.messages: List[BaseMessage] = [
+        messages = []
+        messages: List[BaseMessage] = [
             SystemMessage(content=self._system_prompt.format(
-                user_context=self.ctx,
+                user_context=ctx,
                 search_context=search_ctx,
                 ))
-        ] + self.chat_history  # type: ignore
+        ] + chat_history  # type: ignore
 
         t = datetime.now()
         self.logger.debug("Starting prediction")
 
         result = self._model.predict_messages(
-            messages=self.messages,  # type: ignore
+            messages=messages,  # type: ignore
             stop=["</s>"],
             )
-        self.chat_history.append(AIMessage(content=result.content + f"\nYou can find more information in {source}" if source is not None else ""))  # type: ignore
+        chat_history.append(AIMessage(content=result.content + f"\nYou can find more information in {source}" if source is not None else ""))  # type: ignore
         self.logger.info(
             f"ai response: {result.content}\n \
             Prediction took: {datetime.now()-t}"
@@ -214,23 +220,23 @@ class BaseChatBot:
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
-        self.course_code = embedder.get_course_code(GetCourseParams(subject_name=params.subject), db)
-        self.logger.info(f"Got course code: {self.course_code}")
+        course_code = embedder.get_course_code(GetCourseParams(subject_name=params.subject), db)
+        self.logger.info(f"Got course code: {course_code}")
         self.logger.debug(f"Starting to initiate chat for user {user.id}")
-        chat_id = create_or_get_chat_in_db(user.id, self.course_code, db)
+        chat_id = create_or_get_chat_in_db(user.id, course_code, db)
         self.logger.debug("Got chat")
-        self.chat_history = get_all_chat_messages(str(chat_id), db)
+        chat_history = get_all_chat_messages(str(chat_id), db)
         self.logger.debug("Got messages")
-        self.ctx = get_system_prompt("user_ctx.txt").format(
+        ctx = get_system_prompt("user_ctx.txt").format(
             user_name=user.name,
             user_gender=user.gender,
             user_year=user.year,
             user_course=user.department,
             subject_request=params.subject,
         )
-        self.chat_history = self.chat_history + [self.get_opener_message(self.chat_history)]
+        chat_history = chat_history + [self.get_opener_message(chat_history, ctx)]
         self.logger.info(
-            f"Initiated with {len(self.chat_history)} existing messages"
+            f"Initiated with {len(chat_history)} existing messages"
         )
         return InitiateChatResult(
             messages=[
@@ -239,7 +245,7 @@ class BaseChatBot:
                     else "bot",
                     "message": chat.content,
                 }
-                for chat in self.chat_history
+                for chat in chat_history
             ]  # type: ignore
         )
 

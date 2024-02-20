@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from './apiConfig';
 
 const Login = ({ onLoginSuccess }) => {
   const [isRegistering, setRegistering] = useState(false);
@@ -22,7 +23,7 @@ const Login = ({ onLoginSuccess }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/client/login", {
+      const response = await fetch(`${apiUrl}/client/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
@@ -78,7 +79,7 @@ const Login = ({ onLoginSuccess }) => {
         year
       };
 
-      const response = await fetch("http://localhost:4000/client/register", {
+      const response = await fetch(`${apiUrl}/client/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

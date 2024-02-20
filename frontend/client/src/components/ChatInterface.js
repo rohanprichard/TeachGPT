@@ -8,7 +8,8 @@ function ChatInterface({ accessToken }) {
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('')
+  // const [course_code] = useState('');
   const [subjects, setSubjects] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
@@ -37,9 +38,55 @@ function ChatInterface({ accessToken }) {
     };
   
     fetchSubjects();
-  }, [accessToken]);
+  }, [accessToken]);  
+  
+  
+  // const getDocument = async (event) => {
+  //   event.preventDefault();
+
+  //   const response = await fetch(`${apiUrl}/embed/${course_code}/${filename}`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Authorization': `Bearer ${accessToken}`
+  //     },
+  //   });
+
+  //   const blob = new Blob([response.data]);
+  //   const url = URL.createObjectURL(blob);
+  //   return url
+  //   };
+
+  // useEffect(() => {
+  //   const fetchInitialMessages = async () => {
+  //     try {
+  //       const init_body = {
+  //         subject: selectedSubject,
+  //       };
+  //     const response = await fetch(`${apiUrl}/chat/initiate`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${accessToken}` // Include the access token in the headers
+  //       },
+  //       body: JSON.stringify(init_body),
+  //     });
 
 
+  //       const data = await response.json();
+
+  //       const initialMessages = data.messages.map((message) => ({
+  //         text: message.message,
+  //         isBot: message.role === 'bot',
+  //       }));
+
+  //       setMessages(initialMessages);
+  //     } catch (error) {
+  //       console.error('Error fetching initial messages:', error);
+  //     }
+  //   };
+
+  //   fetchInitialMessages();
+  // }, [accessToken, course_code, filename]);
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
@@ -72,15 +119,16 @@ function ChatInterface({ accessToken }) {
     fetchInitialMessages();
   }, [accessToken, selectedSubject]);
 
-
   const handleSendMessage = async (event) => {
     event.preventDefault();
     if (!inputText.trim()) return; // Prevent sending empty messages
+
     const userMessage = { text: inputText, isBot: false };
     const body = {
       message: inputText,
       subject: selectedSubject
     }
+
     setMessages([...messages, userMessage]);
     setInputText('');
     setIsSending(true);
@@ -120,19 +168,18 @@ function ChatInterface({ accessToken }) {
         </select>
       </header>
       
-      
         <div className="chat-messages">
           {messages.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))}
           <div ref={messagesEndRef} />
         </div>
-      
+
       <form className="chat-input" onSubmit={handleSendMessage} autoComplete="off">
         <input
           id="in"
           type="text"
-          placeholder="Message..."
+          placeholder="Enter Message..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           disabled={isSending}
