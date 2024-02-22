@@ -41,20 +41,6 @@ function ChatInterface({ accessToken }) {
   }, [accessToken]);  
   
   
-  // const getDocument = async (event) => {
-  //   event.preventDefault();
-
-  //   const response = await fetch(`${apiUrl}/embed/${course_code}/${filename}`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Authorization': `Bearer ${accessToken}`
-  //     },
-  //   });
-
-  //   const blob = new Blob([response.data]);
-  //   const url = URL.createObjectURL(blob);
-  //   return url
-  //   };
 
   // useEffect(() => {
   //   const fetchInitialMessages = async () => {
@@ -107,7 +93,7 @@ function ChatInterface({ accessToken }) {
 
         const initialMessages = data.messages.map((message) => ({
           text: message.message,
-          isBot: message.role === 'bot',
+          isBot: message.role === 'bot'
         }));
 
         setMessages(initialMessages);
@@ -143,7 +129,7 @@ function ChatInterface({ accessToken }) {
     });
 
     const data = await response.json();
-    const botMessage = { text: data.message, isBot: true };
+    const botMessage = { text: data.message, isBot: true, document_name: data.document_name };
     setMessages(currentMessages => [...currentMessages, botMessage]);
     setIsSending(false);
   };

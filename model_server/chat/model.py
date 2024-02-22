@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 
 class ChatMessageParams(BaseModel):
@@ -21,3 +21,4 @@ class InitiateChatResult(BaseModel):
 
 class ChatMessageResult(BaseModel):
     message: str
+    document_name: Optional[str]

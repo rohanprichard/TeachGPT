@@ -180,7 +180,7 @@ class BaseChatBot:
             messages=messages,  # type: ignore
             stop=["</s>"],
             )
-        chat_history.append(AIMessage(content=result.content + f"\nYou can find more information in {source}" if source is not None else ""))  # type: ignore
+        chat_history.append(AIMessage(content=result.content))  # type: ignore
         self.logger.info(
             f"ai response: {result.content}\n \
             Prediction took: {datetime.now()-t}"
@@ -212,7 +212,10 @@ class BaseChatBot:
 
         db.commit()
 
-        return ChatMessageResult(message=str(result.content) + (f"\n\nYou can find more information in <p onClick={{getDocument}}>{source}.</p>" if len(source) > 3 else ""))
+        return ChatMessageResult(
+            message=str(result.content) + (f"\n\nYou can find more information in {source}." if len(source) > 3 else ""),
+            document_name=f"{course_code}/{source}" if len(source) > 3 else ""
+        )
 
     def initiate_chat(
         self,
