@@ -78,7 +78,7 @@ class BaseChatBot:
         self.logger.setLevel(logging_level)
 
         self.logger.info("Initiated local chat model")
-        print(cfg)
+        # print(cfg)
         if cfg["USE_OPENAI_ENDPOINT"] == 1:
 
             self.logger.info("Using OpenAI")
