@@ -268,15 +268,18 @@ class Embedder:
         return result.id
 
     def search_documents(self, course_code, filename):
-        path = os.path.join(ROOT_DIR, "documents", course_code, filename)
+        try:
+            path = os.path.join(ROOT_DIR, "documents", course_code, filename)
 
-        if path[-3:] == "pdf":
-            response = FileResponse(path, media_type="application/pdf")
-        elif path[-4:] == "pptx":
-            response = FileResponse(path, media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
-        else:
-            response = FileResponse(path, media_type="application/vnd.ms-powerpoint")
-        return response
+            if path[-3:] == "pdf":
+                response = FileResponse(path, media_type="application/pdf")
+            elif path[-4:] == "pptx":
+                response = FileResponse(path, media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+            else:
+                response = FileResponse(path, media_type="application/vnd.ms-powerpoint")
+            return response
+        except Exception:
+            return
 
 
 embedder = Embedder()

@@ -32,9 +32,7 @@ body, html {
 .chat-header {
   position: sticky;
   top: 0;
-  padding: 0px 16px 0px 200px;
-  /* padding-top: 0px;
-  padding-bottom: 0px; */
+  padding: 0px 3% 0px 3%;
   background-color: var(--sec-bg);
   color: var(--white);
   text-align: center;
@@ -42,7 +40,6 @@ body, html {
   font-family: 'Garamond', Times, serif;
   display: flex;
   align-items: center;
-  box-sizing: border-box;
 }
 
 #subjectSelect{
@@ -60,7 +57,7 @@ body, html {
 .chat-messages {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 10px 20%;
+  padding: 1% 5%;
   /* margin-top: 20px; */
   /* margin: 0 20px; */
   /* width: 60%; */
@@ -216,6 +213,13 @@ label{
 .btn-primary {
   background-color: #135ba0;
   color: #fff;
+}
+
+.chat-message .btn-primary {
+  background-color: #404040;
+  color: #fff;
+  border-color: #ccc;
+  border-radius: 2px;
 }
 
 .btn-primary:hover {
