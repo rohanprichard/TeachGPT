@@ -6,11 +6,6 @@
   --white: #ecebeb;
 }
 
-
-
-/* Reset some default styles */
-
-
 body, html {
   margin: 0;
   padding: 0;
@@ -22,13 +17,12 @@ body, html {
 
 @media only screen and (max-width: 600px) {
   body {
-    font-size: 12px; /* Adjust the font size for mobile */
+    font-size: 12px;
   }
 }
-/* Chat Styles */
+
 .chat-container {
   display: flex;
-  /* border: 10px solid red; */
   flex-direction: column;
   height: 100vh;
   width: 100%;
