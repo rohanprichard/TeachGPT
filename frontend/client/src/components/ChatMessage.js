@@ -5,7 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import { apiUrl } from './apiConfig';
 
 function ChatMessage({ message }) {
-  // Only parse markdown for bot messages
 
 
   const content = message.isBot ? (
@@ -23,31 +22,14 @@ function ChatMessage({ message }) {
       console.log(doc_url)
       const response = await fetch(`${apiUrl}/embed/documents/${encodeURIComponent(doc_url)}`, {
         method: 'GET',
-        // headers: {
-        //   'Authorization': `Bearer ${accessToken}`
-        // },
       });
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
-      // Open the Blob URL in a new window
       window.open(url, '_blank');
 
-      // const blob = new Blob([response.data]);
-      // const url = await URL.createObjectURL(blob);
-      // window.open(url); 
-
-
-      // const a = document.createElement('a');
-      // a.href = url;
-
-      // a.download = doc_url.substring(doc_url.lastIndexOf('/') + 1);
-
-      // a.click();
-
-      // URL.revokeObjectURL(url);
-      // a.remove();
+      
     }
     };
 

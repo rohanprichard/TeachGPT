@@ -15,7 +15,7 @@ from model_server.chat.model import HTTPErrorResponse
 from model_server.database.database import get_db
 from model_server.deps import get_current_user
 from model_server.config import logging_level
-from .model import DocumentResult, ExtractionResult, AddSubjectParams, GetCourseParams
+from .model import DocumentListParams, DocumentResult, ExtractionResult, AddSubjectParams, GetCourseParams, ReturnDocumentList
 from .util import pdf_extraction_alg, pptx_extraction_alg
 
 
@@ -49,7 +49,7 @@ class Embedder:
         self.router.add_api_route(
             "/documents",
             endpoint=self.list_documents,
-            methods=["GET"],
+            methods=["POST"],
             responses={
                 200: {"model": DocumentResult},
                 401: {"model": HTTPErrorResponse},
@@ -88,6 +88,11 @@ class Embedder:
             methods=["GET"]
         )
 
+        self.router.add_api_route(
+            "/documents/delete/{course_code}/{filename}",
+            endpoint=self.delete_document,
+            methods=["GET"]
+        )
         # DEPRECATED
         # self.router.add_api_route(
         #     "/courses/get_code",
@@ -207,6 +212,11 @@ class Embedder:
         ))  # type: ignore
         db.commit()
 
+    def delete_document_from_vectorstore(self, doc_name):
+        self._collection.delete(
+            where={"source": doc_name}
+        )
+
     def query(self, message, course_id):
 
         results = self._collection.query(
@@ -227,11 +237,14 @@ class Embedder:
 
     def list_documents(
         self,
+        data: DocumentListParams,
         db: Session = Depends(get_db),
-        user: User = Depends(get_current_user)
+        user: User = Depends(get_current_user),
     ):
-        result = db.query(Document).all()
-        return result
+        course_code = self.get_course_code(GetCourseParams(subject_name=data.subject), db)
+        self.logger.debug(f"course code: {course_code}")
+        result = db.query(Document).filter(Document.course_code == course_code).all()  # type: ignore
+        return ReturnDocumentList(documents=result, course_code=course_code)
 
     def get_all_subjects(
         self,
@@ -279,6 +292,24 @@ class Embedder:
             return response
         except Exception:
             return
+
+    def delete_document(
+        self,
+        course_code,
+        filename,
+        db: Session = Depends(get_db),
+    ):
+        try:
+            self.logger.debug(f"1course code: {course_code}")
+            db.query(Document).filter(Document.document_name == filename).delete()  # type: ignore
+            db.commit()
+            self.logger.debug(f"2course code: {course_code}")
+            self.delete_document_from_vectorstore(filename)
+            path = os.path.join(ROOT_DIR, "documents", course_code, filename)
+            os.remove(path)
+            return "success"
+        except Exception:
+            return "failed"
 
 
 embedder = Embedder()

@@ -17,3 +17,12 @@ class AddSubjectParams(BaseModel):
 
 class GetCourseParams(BaseModel):
     subject_name: str
+
+
+class ReturnDocumentList(BaseModel):
+    documents: List
+    course_code: str
+
+
+class DocumentListParams(BaseModel):
+    subject: str

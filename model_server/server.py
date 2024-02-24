@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -27,12 +28,15 @@ async def root(
 ):
     return {"db": "ok"}
 
+@app.get("/admin")
+async def subapp1():
+    return FileResponse("frontend/admin/build/index.html")
 
 app.include_router(chat.router, prefix="/chat")
 app.include_router(embedder.router, prefix="/embed")
 app.include_router(client.router, prefix="/client")
 
-app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="static")
+app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="client")
 
 app.add_middleware(
     CORSMiddleware,

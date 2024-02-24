@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
 import sys
-import psycopg2
 
 from model_server.config import cfg, logging_level
 
@@ -19,12 +18,14 @@ if cfg["DEV"]:
     logger.info("Swapping sqlite for ChromaDB fix")
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-logger.info(f"Starting SQL DB engine {SQLALCHEMY_DATABASE_URL}")
+logger.info(f"Starting SQL DB engine {cfg['DB_URL']}")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     # connect_args={'check_same_thread': False}
+
 )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

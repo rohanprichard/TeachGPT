@@ -9,7 +9,6 @@ function ChatInterface({ accessToken }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('')
-  // const [course_code] = useState('');
   const [subjects, setSubjects] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
@@ -42,37 +41,6 @@ function ChatInterface({ accessToken }) {
   
   
 
-  // useEffect(() => {
-  //   const fetchInitialMessages = async () => {
-  //     try {
-  //       const init_body = {
-  //         subject: selectedSubject,
-  //       };
-  //     const response = await fetch(`${apiUrl}/chat/initiate`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${accessToken}` // Include the access token in the headers
-  //       },
-  //       body: JSON.stringify(init_body),
-  //     });
-
-
-  //       const data = await response.json();
-
-  //       const initialMessages = data.messages.map((message) => ({
-  //         text: message.message,
-  //         isBot: message.role === 'bot',
-  //       }));
-
-  //       setMessages(initialMessages);
-  //     } catch (error) {
-  //       console.error('Error fetching initial messages:', error);
-  //     }
-  //   };
-
-  //   fetchInitialMessages();
-  // }, [accessToken, course_code, filename]);
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
