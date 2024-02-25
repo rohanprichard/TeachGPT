@@ -7,6 +7,12 @@ function AdminInterface({ accessToken }) {
     const [subjects, setSubjects] = useState([]);
     const [docs, setDocs] = useState([]);
     const documentEndRef = useRef(null);
+    const [addDocument, setAddDocument] = useState('');
+    const [course_code, setCourseCode] = useState('');
+    const [course_name, setCourseName] = useState('');
+    const [addSubject, setAddSubject] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
+
 
     const handleSubjectChange = (event) => {
         setSelectedSubject(event.target.value);
@@ -60,6 +66,55 @@ function AdminInterface({ accessToken }) {
         fetchAllDocuments();
     }, [accessToken, selectedSubject]);
 
+    const handleAddCourse = async () => {
+        try {
+            const init_body = {
+            course_code: course_code,
+            subject_name: course_name
+            };
+        const response = await fetch(`${apiUrl}/embed/courses/add`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(init_body),
+        });
+            const data = await response.json();
+            console.log(data)
+        }catch (error) {
+            console.error('Error posting document', error);
+        }
+        setAddSubject(false)
+        
+    }
+
+    const handleAddDocument = async () =>{
+        const updatedFile = new File([selectedFile], course_code + selectedFile.name, {
+            type: selectedFile.type,
+            lastModified: selectedFile.lastModified,
+        });
+        console.log(updatedFile)
+        const formData = new FormData();
+        formData.append('files', updatedFile);
+
+        const response = await fetch(`${apiUrl}/embed/`, {
+            method: 'POST',
+            headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+            },
+            body: formData,
+        });
+
+        console.log(response)
+
+        setAddDocument(false)
+    }
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
 
     return (
         <div className='interface'>
@@ -72,7 +127,41 @@ function AdminInterface({ accessToken }) {
                         </option>
                     ))}
                 </select>
+                <input type="button" className="btn btn-primary mr-2" value="Add Course" onClick={() => setAddSubject(true)}/>
+                <input type="button" className="btn btn-primary mr-2" value="Add Document" onClick={() => setAddDocument(true)}/>
             </div>
+            {
+                addDocument &&
+                <form action='submit'>
+                    <div className="form-group">
+                        <label>Course Code:</label>
+                        <br/><input className="form-control" type="text" value={course_code} onChange={(e) => setCourseCode(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                        <label>File:</label>
+                        <input type="file" onChange={handleFileChange} />
+                        <br/><input className="form-control" type="text" value={course_name} onChange={(e) => setCourseName(e.target.value)} />
+                    </div>
+
+                    <input type="button" className="btn btn-primary mr-2" value="Upload" onClick={handleAddDocument} />
+                </form>
+            }
+            <br/>
+            {
+                addSubject &&
+                <form action='submit'>
+                    <div className="form-group">
+                        <label>Course Code:</label>
+                        <br/><input className="form-control" type="text" value={course_code} onChange={(e) => setCourseCode(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                        <label>Course Name:</label>
+                        <br/><input className="form-control" type="text" value={course_name} onChange={(e) => setCourseName(e.target.value)} />
+                    </div>
+
+                    <input type="button" className="btn btn-primary mr-2" value="Register" onClick={handleAddCourse} />
+                </form>
+            }
             <div className="card-container">
                 <div className="doc-card-body">
                     {
