@@ -28,15 +28,17 @@ async def root(
 ):
     return {"db": "ok"}
 
-@app.get("/admin")
-async def subapp1():
-    return FileResponse("frontend/admin/build/index.html")
+# @app.get("/admin")
+# async def subapp1():
+#     return FileResponse("frontend/admin/build/index.html")
 
 app.include_router(chat.router, prefix="/chat")
 app.include_router(embedder.router, prefix="/embed")
 app.include_router(client.router, prefix="/client")
+app.mount("/admin/", StaticFiles(directory="frontend/admin/build", html=True), name="client")
 
 app.mount("/", StaticFiles(directory="frontend/client/build", html=True), name="client")
+
 
 app.add_middleware(
     CORSMiddleware,
