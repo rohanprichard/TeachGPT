@@ -140,7 +140,6 @@ function AdminInterface({ accessToken }) {
                     <div className="form-group">
                         <label>File:</label>
                         <input type="file" onChange={handleFileChange} />
-                        <br/><input className="form-control" type="text" value={course_name} onChange={(e) => setCourseName(e.target.value)} />
                     </div>
 
                     <input type="button" className="btn btn-primary mr-2" value="Upload" onClick={handleAddDocument} />
