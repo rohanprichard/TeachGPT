@@ -18,7 +18,7 @@ if cfg["DEV"]:
     logger.info("Swapping sqlite for ChromaDB fix")
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-logger.info("Starting SQL DB engine ")
+logger.info("Starting SQL DB engine")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
