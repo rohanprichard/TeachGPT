@@ -1,0 +1,30 @@
+title: "TeachGPT Documentation"
+description: "Documentation for TeachGPT – a client-server chatbot system for educational institutions."
+remote_theme: pmarsceill/just-the-docs
+plugins:
+  - jekyll-remote-theme
+baseurl: "" # Set this if deploying to a project page (e.g. /your-repo-name)
+
+# Configuration for Just the Docs: sets up a primary (side) navigation menu.
+just_the_docs:
+  primary_nav:
+    - title: "Overview"
+      url: /docs/Overview/
+    - title: "Architecture"
+      url: /docs/Architecture/
+    - title: "Backend API"
+      url: /docs/Backend_API/
+    - title: "Database"
+      url: /docs/Database/
+    - title: "Embedding Module"
+      url: /docs/EmbeddingModule/
+    - title: "Chat Module"
+      url: /docs/ChatModule/
+    - title: "Frontend"
+      url: /docs/Frontend/
+    - title: "Setup and Installation"
+      url: /docs/Setup_and_Installation/
+    - title: "API Configuration"
+      url: /docs/API_Config/
+    - title: "Deployment"
+      url: /docs/Deployment/
