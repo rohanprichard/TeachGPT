@@ -1,6 +1,6 @@
 title: "TeachGPT Documentation"
 description: "Documentation for TeachGPT – a client-server chatbot system for educational institutions."
-remote_theme: pmarsceill/just-the-docs
+theme: just-the-docs
 plugins:
   - jekyll-remote-theme
 baseurl: "" # Set this if deploying to a project page (e.g. /your-repo-name)

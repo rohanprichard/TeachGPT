@@ -7,14 +7,12 @@ title: "TeachGPT Documentation Home"
 
 This documentation provides detailed information about the TeachGPT system, including:
 
-- An **Overview** of the project  
-- **Architecture** details  
-- **Backend API** endpoints  
-- **Database** schema and models  
-- **Embedding** and **Chat Modules**  
-- **Frontend** interfaces  
-- **Setup and Installation** instructions  
-- **API Configuration**  
-- **Deployment** guidelines  
-
-Use the side navigation (powered by the theme) to explore topics.
+- [An **Overview**](docs/Overview.md) of the project  
+- [**Architecture**](docs/Architecture.md) details  
+- [**Backend API**](docs/Backend_API.md) endpoints  
+- [**Database**](docs/Database.md) schema and models  
+- [**Embedding**](docs/EmbeddingModule.md) and [**Chat Modules**](docs/ChatModule.md)  
+- [**Frontend**](docs/Frontend.md) interfaces  
+- [**Setup and Installation**](docs/Setup_and_Installation.md) instructions  
+- [**API Configuration**](docs/API_Config.md)  
+- [**Deployment**](docs/Deployment.md) guidelines  
